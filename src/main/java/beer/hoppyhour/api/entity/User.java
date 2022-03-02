@@ -2,14 +2,17 @@ package beer.hoppyhour.api.entity;
 
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
@@ -35,7 +38,7 @@ public class User {
     
     @JsonIgnore
     @Column(name = "password")
-    private  String password;
+    private String password;
 
     @CreationTimestamp
     @Column(name = "created_date", updatable = false)
@@ -49,6 +52,15 @@ public class User {
     @JsonIgnore
     @Column(name = "version")
     private Long version;
+
+    @OneToMany(mappedBy = "user",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Recipe> recipes;
 
     public void setPassword(String password) {
         this.password = password; //TODO encrypt password
@@ -107,7 +119,7 @@ public class User {
         return updatedDate;
     }
 
-    public void setLastModifiedDate(Timestamp updatedDate) {
+    public void setUpdatedDate(Timestamp updatedDate) {
         this.updatedDate = updatedDate;
     }
 
@@ -134,6 +146,25 @@ public class User {
 	@Override
     public String toString() {
         return "User [createdDate=" + createdDate + ", displayName=" + displayName + ", email=" + email + ", id=" + id
-                + ", password=" + password + ", updatedDate=" + updatedDate + ", version=" + version + "]";
+                + ", password=" + password + " updatedDate=" + updatedDate + ", version="
+                + version + "]";
+    }
+
+    public List<Recipe> getRecipes() {
+        return recipes;
+    }
+
+    public void setRecipes(List<Recipe> recipes) {
+        this.recipes = recipes;
+    }
+
+    //add convenience methods for bi-directional relationship
+    public void addRecipe(Recipe recipe) {
+        if (recipes == null) {
+            recipes = new ArrayList<>();
+        }
+
+        recipes.add(recipe);
+        recipe.setUser(this);
     }
 }
