@@ -22,10 +22,10 @@ This API uses Spring Data REST. The docs for this Spring project can be found [h
 
 ## Next moves:
 
-    [] - add ingredient tables
-    [] - add ingredient_detail tables
-    [] - add rating table
-    [] - add comment table
-    [] - add recipe_event table
-    [] - add place table
-    [] - Add Spring Security to manage user passwords, roles, and secure data
+[] - add ingredient tables
+[] - add ingredient_detail tables
+[] - add rating table
+[] - add comment table
+[] - add recipe_event table
+[] - add place table
+[] - Add Spring Security to manage user passwords, roles, and secure data
