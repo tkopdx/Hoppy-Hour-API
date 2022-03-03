@@ -1,6 +1,5 @@
 package beer.hoppyhour.api.component;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
@@ -9,30 +8,32 @@ import com.github.javafaker.Faker;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import beer.hoppyhour.api.doa.UserRepository;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Brewing;
+import beer.hoppyhour.api.entity.Hop;
+import beer.hoppyhour.api.entity.Malt;
+import beer.hoppyhour.api.entity.OtherIngredient;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
+import beer.hoppyhour.api.entity.Yeast;
+import beer.hoppyhour.api.hops.AmarilloType;
+import beer.hoppyhour.api.hops.CascadeType;
+import beer.hoppyhour.api.hops.CentennialType;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-	private final UserRepository userRepository;
-
-	@Autowired
-	public DatabaseLoader(UserRepository userRepository) {
-		this.userRepository = userRepository;
-	}
+	private final static Faker faker = new Faker();
 
 	@Override
 	public void run(String... strings) throws Exception {
+		
+		
 		for (int i = 0; i <= 10; i++) {
 			SessionFactory factory = new Configuration()
 					.configure("hibernate.cfg.xml")
@@ -42,6 +43,10 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(Brewing.class)
 					.addAnnotatedClass(Scheduling.class)
 					.addAnnotatedClass(ToBrew.class)
+					.addAnnotatedClass(Malt.class)
+					.addAnnotatedClass(Hop.class)
+					.addAnnotatedClass(Yeast.class)
+					.addAnnotatedClass(OtherIngredient.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -214,22 +219,104 @@ public class DatabaseLoader implements CommandLineRunner {
 				System.out.println("Done putting in the breweds!");
 			} finally {
 				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Malt malt1 = getFakeMalt();
+				Malt malt2 = getFakeMalt();
+				Malt malt3 = getFakeMalt();
+
+				session.save(malt1);
+				session.save(malt2);
+				session.save(malt3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some malts!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Yeast yeast1 = getFakeYeast();
+				Yeast yeast2 = getFakeYeast();
+				Yeast yeast3 = getFakeYeast();
+
+				session.save(yeast1);
+				session.save(yeast2);
+				session.save(yeast3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some yeasts!!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				OtherIngredient other1 = getFakeOtherIngredient();
+				OtherIngredient other2 = getFakeOtherIngredient();
+				OtherIngredient other3 = getFakeOtherIngredient();
+
+				session.save(other1);
+				session.save(other2);
+				session.save(other3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some other ingredients!!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Hop amarillo = new Hop(AmarilloType.NAME, faker.company().name(), faker.internet().image(), AmarilloType.COMMENTS, AmarilloType.STABILITY, AmarilloType.A_L, AmarilloType.A_H);
+				Hop cascade = new Hop(CascadeType.NAME, faker.company().name(), faker.internet().image(), CascadeType.COMMENTS, CascadeType.STABILITY, CascadeType.A_L, CascadeType.A_H);
+				Hop centennial = new Hop(CentennialType.NAME, faker.company().name(), faker.internet().image(), CentennialType.COMMENTS, CentennialType.STABILITY, CentennialType.A_L, CentennialType.A_H);
+
+				session.save(amarillo);
+				session.save(cascade);
+				session.save(centennial);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some hops!");
+			} finally {
+				session.close();
 				factory.close();
 			}
-			
 		}
 
 	}
 
+	private OtherIngredient getFakeOtherIngredient() {
+		OtherIngredient other = new OtherIngredient(faker.food().spice(), faker.company().name(), faker.internet().image(), faker.lorem().paragraph());
+		return other;
+	}
+
+	private Yeast getFakeYeast() {
+		Yeast yeast = new Yeast(faker.beer().yeast(), faker.company().name(), faker.internet().image(), faker.lorem().paragraph());
+		return yeast;
+	}
+
+	private Malt getFakeMalt() {
+		Malt malt = new Malt(faker.beer().malt(), faker.company().name(), faker.internet().image(), faker.lorem().paragraph());
+		return malt;
+	}
+
 	private User getFakeUser() {
-		Faker faker = new Faker();
 		User user = new User(faker.name().username(), faker.internet().emailAddress(), "password");
 		return user;
 	}
 
 	private Recipe getFakeRecipe() {
-		Faker faker = new Faker();
-
 		String name = faker.beer().name();
 		Double fakeGravity = faker.number().randomDouble(3, 1, 2);
 		String method = faker.beer().malt();
