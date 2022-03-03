@@ -62,6 +62,42 @@ public class User {
                 })
     private List<Recipe> recipes;
 
+    @OneToMany(mappedBy = "user",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Brewed> breweds;
+
+    @OneToMany(mappedBy = "user",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Brewing> brewings;
+
+    @OneToMany(mappedBy = "user",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Scheduling> schedulings;
+
+    @OneToMany(mappedBy = "user",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<ToBrew> toBrews;
+
     public void setPassword(String password) {
         this.password = password; //TODO encrypt password
     }
@@ -166,5 +202,41 @@ public class User {
 
         recipes.add(recipe);
         recipe.setUser(this);
+    }
+
+    public void addBrewed(Brewed brewed) {
+        if (breweds == null) {
+            breweds = new ArrayList<>();
+        }
+
+        breweds.add(brewed);
+        brewed.setUser(this);
+    }
+
+    public void addBrewing(Brewing brewing) {
+        if (brewings == null) {
+            brewings = new ArrayList<>();
+        }
+
+        brewings.add(brewing);
+        brewing.setUser(this);
+    }
+
+    public void addScheduling(Scheduling scheduling) {
+        if (schedulings == null) {
+            schedulings = new ArrayList<>();
+        }
+
+        schedulings.add(scheduling);
+        scheduling.setUser(this);
+    }
+
+    public void addToBrew(ToBrew toBrew) {
+        if (toBrews == null) {
+            toBrews = new ArrayList<>();
+        }
+
+        toBrews.add(toBrew);
+        toBrew.setUser(this);
     }
 }

@@ -1,6 +1,8 @@
 package beer.hoppyhour.api.entity;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -83,6 +86,42 @@ public class Recipe {
     })
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Brewed> breweds;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Brewing> brewings;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<Scheduling> schedulings;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<ToBrew> toBrews;
 
     private Recipe() {}
 
@@ -251,5 +290,42 @@ public class Recipe {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    //convenience methods for bi-directional relationship
+    public void addBrewed(Brewed brewed) {
+        if (breweds == null) {
+            breweds = new ArrayList<>();
+        }
+
+        breweds.add(brewed);
+        brewed.setRecipe(this);
+    }
+
+    public void addBrewing(Brewing brewing) {
+        if (brewings == null) {
+            brewings = new ArrayList<>();
+        }
+
+        brewings.add(brewing);
+        brewing.setRecipe(this);
+    }
+
+    public void addScheduling(Scheduling scheduling) {
+        if (schedulings == null) {
+            schedulings = new ArrayList<>();
+        }
+
+        schedulings.add(scheduling);
+        scheduling.setRecipe(this);
+    }
+
+    public void addToBrew(ToBrew toBrew) {
+        if (toBrews == null) {
+            toBrews = new ArrayList<>();
+        }
+
+        toBrews.add(toBrew);
+        toBrew.setRecipe(this);
     }
 }

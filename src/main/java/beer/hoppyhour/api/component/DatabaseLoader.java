@@ -1,6 +1,8 @@
 package beer.hoppyhour.api.component;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.Date;
 
 import com.github.javafaker.Faker;
 
@@ -12,7 +14,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import beer.hoppyhour.api.doa.UserRepository;
+import beer.hoppyhour.api.entity.Brewed;
+import beer.hoppyhour.api.entity.Brewing;
 import beer.hoppyhour.api.entity.Recipe;
+import beer.hoppyhour.api.entity.Scheduling;
+import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 
 @Component
@@ -32,6 +38,10 @@ public class DatabaseLoader implements CommandLineRunner {
 					.configure("hibernate.cfg.xml")
 					.addAnnotatedClass(User.class)
 					.addAnnotatedClass(Recipe.class)
+					.addAnnotatedClass(Brewed.class)
+					.addAnnotatedClass(Brewing.class)
+					.addAnnotatedClass(Scheduling.class)
+					.addAnnotatedClass(ToBrew.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -92,8 +102,121 @@ public class DatabaseLoader implements CommandLineRunner {
 				System.out.println("Done showing you!");
 			} finally {
 				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User userFromDB = session.get(User.class, id);
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+				Brewing brewing1 = new Brewing();
+				Brewing brewing2 = new Brewing();
+				Brewing brewing3 = new Brewing();
+
+				userFromDB.addBrewing(brewing1);
+				userFromDB.addBrewing(brewing2);
+				userFromDB.addBrewing(brewing3);
+				recipeFromDB.addBrewing(brewing1);
+				recipeFromDB.addBrewing(brewing2);
+				recipeFromDB.addBrewing(brewing3);
+
+				session.save(brewing1);
+				session.save(brewing2);
+				session.save(brewing3);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done putting in the brewings!");
+			} finally {
+				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User userFromDB = session.get(User.class, id);
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+				Scheduling scheduling1 = new Scheduling();
+				Scheduling scheduling2 = new Scheduling();
+				Scheduling scheduling3 = new Scheduling();
+
+				userFromDB.addScheduling(scheduling1);
+				userFromDB.addScheduling(scheduling2);
+				userFromDB.addScheduling(scheduling3);
+				recipeFromDB.addScheduling(scheduling1);
+				recipeFromDB.addScheduling(scheduling2);
+				recipeFromDB.addScheduling(scheduling3);
+
+				session.save(scheduling1);
+				session.save(scheduling2);
+				session.save(scheduling3);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done putting in the schedulings!");
+			} finally {
+				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User userFromDB = session.get(User.class, id);
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+
+				long time = Instant.now().toEpochMilli();
+				Date date = new Date();
+				date.setTime(time);
+				ToBrew toBrew1 = new ToBrew(date);
+				ToBrew toBrew2 = new ToBrew(date);
+				ToBrew toBrew3 = new ToBrew(date);
+
+				userFromDB.addToBrew(toBrew1);
+				userFromDB.addToBrew(toBrew2);
+				userFromDB.addToBrew(toBrew3);
+				recipeFromDB.addToBrew(toBrew1);
+				recipeFromDB.addToBrew(toBrew2);
+				recipeFromDB.addToBrew(toBrew3);
+
+				session.save(toBrew1);
+				session.save(toBrew2);
+				session.save(toBrew3);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done putting in the to brews!");
+			} finally {
+				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User userFromDB = session.get(User.class, id);
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+				Brewed brewed1 = new Brewed();
+				Brewed brewed2 = new Brewed();
+				Brewed brewed3 = new Brewed();
+
+				userFromDB.addBrewed(brewed1);
+				userFromDB.addBrewed(brewed2);
+				userFromDB.addBrewed(brewed3);
+				recipeFromDB.addBrewed(brewed1);
+				recipeFromDB.addBrewed(brewed2);
+				recipeFromDB.addBrewed(brewed3);
+
+				session.save(brewed1);
+				session.save(brewed2);
+				session.save(brewed3);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done putting in the breweds!");
+			} finally {
+				session.close();
 				factory.close();
 			}
+			
 		}
 
 	}
