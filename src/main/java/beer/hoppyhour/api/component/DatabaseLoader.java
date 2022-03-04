@@ -11,6 +11,7 @@ import org.hibernate.cfg.Configuration;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import beer.hoppyhour.api.brand.WyeastType;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Brewing;
 import beer.hoppyhour.api.entity.Hop;
@@ -21,9 +22,11 @@ import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.Yeast;
-import beer.hoppyhour.api.hops.AmarilloType;
-import beer.hoppyhour.api.hops.CascadeType;
-import beer.hoppyhour.api.hops.CentennialType;
+import beer.hoppyhour.api.hop.AmarilloType;
+import beer.hoppyhour.api.hop.CascadeType;
+import beer.hoppyhour.api.hop.CentennialType;
+import beer.hoppyhour.api.malt.PilsnerMalt;
+import beer.hoppyhour.api.yeast._1056AmericanAle;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
@@ -278,9 +281,9 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Hop amarillo = new Hop(AmarilloType.NAME, faker.company().name(), faker.internet().image(), AmarilloType.COMMENTS, AmarilloType.STABILITY, AmarilloType.A_L, AmarilloType.A_H);
-				Hop cascade = new Hop(CascadeType.NAME, faker.company().name(), faker.internet().image(), CascadeType.COMMENTS, CascadeType.STABILITY, CascadeType.A_L, CascadeType.A_H);
-				Hop centennial = new Hop(CentennialType.NAME, faker.company().name(), faker.internet().image(), CentennialType.COMMENTS, CentennialType.STABILITY, CentennialType.A_L, CentennialType.A_H);
+				Hop amarillo = new Hop(AmarilloType.NAME, faker.company().name(), AmarilloType.IMAGEURL, AmarilloType.NOTES, AmarilloType.STABILITY, AmarilloType.A_L, AmarilloType.A_H);
+				Hop cascade = new Hop(CascadeType.NAME, faker.company().name(), CascadeType.IMAGEURL, CascadeType.NOTES, CascadeType.STABILITY, CascadeType.A_L, CascadeType.A_H);
+				Hop centennial = new Hop(CentennialType.NAME, faker.company().name(), CentennialType.IMAGEURL, CentennialType.NOTES, CentennialType.STABILITY, CentennialType.A_L, CentennialType.A_H);
 
 				session.save(amarillo);
 				session.save(cascade);
@@ -302,12 +305,12 @@ public class DatabaseLoader implements CommandLineRunner {
 	}
 
 	private Yeast getFakeYeast() {
-		Yeast yeast = new Yeast(faker.beer().yeast(), faker.company().name(), faker.internet().image(), faker.lorem().paragraph());
+		Yeast yeast = new Yeast(_1056AmericanAle.NAME, WyeastType.NAME, _1056AmericanAle.IMAGEURL, _1056AmericanAle.NOTES, _1056AmericanAle.TYPE, _1056AmericanAle.FLOCCULATION, _1056AmericanAle.ATTEN_LOW, _1056AmericanAle.ATTEN_HIGH, _1056AmericanAle.ABV_TOL, _1056AmericanAle.TEMP_HIGH, _1056AmericanAle.TEMP_LOW);
 		return yeast;
 	}
 
 	private Malt getFakeMalt() {
-		Malt malt = new Malt(faker.beer().malt(), faker.company().name(), faker.internet().image(), faker.lorem().paragraph());
+		Malt malt = new Malt(PilsnerMalt.NAME, faker.company().name(), PilsnerMalt.IMAGEURL, PilsnerMalt.NOTES, PilsnerMalt.FUNCTION, PilsnerMalt.TYPE);
 		return malt;
 	}
 

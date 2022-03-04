@@ -5,6 +5,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.MappedSuperclass;
 
 
@@ -25,7 +26,8 @@ public class Ingredient {
     @Column(name = "image")
     private String image;
 
-    @Column(name = "description")
+    @Column(name = "description",
+            columnDefinition = "TEXT(10000)")
     private String description;
 
     public Ingredient() {}
