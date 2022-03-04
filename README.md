@@ -18,6 +18,9 @@ This API uses Spring Data REST. The docs for this Spring project can be found [h
 4. To work with specific rows, add the row id, like this: http://localhost:8080/api/users/1.
 5. You can also work with relationships. For more on that, check out this link: https://www.baeldung.com/spring-data-rest-relationships
 
+## A note on measurement systems
+All liquid volumes, weights, etc. are in metric unless otherwise noted. All temperatures are in Celsius unless noted otherwise.
+
 ## That's all for now!
 
 ## Next moves:
