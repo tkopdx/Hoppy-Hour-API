@@ -15,17 +15,25 @@ import beer.hoppyhour.api.brand.WyeastType;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Brewing;
 import beer.hoppyhour.api.entity.Hop;
+import beer.hoppyhour.api.entity.HopDetail;
+import beer.hoppyhour.api.entity.Ingredient;
+import beer.hoppyhour.api.entity.IngredientDetail;
 import beer.hoppyhour.api.entity.Malt;
+import beer.hoppyhour.api.entity.MaltDetail;
 import beer.hoppyhour.api.entity.OtherIngredient;
+import beer.hoppyhour.api.entity.OtherIngredientDetail;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.Yeast;
+import beer.hoppyhour.api.entity.YeastDetail;
 import beer.hoppyhour.api.hop.AmarilloType;
 import beer.hoppyhour.api.hop.CascadeType;
 import beer.hoppyhour.api.hop.CentennialType;
+import beer.hoppyhour.api.hop.HopPurposeType;
 import beer.hoppyhour.api.malt.PilsnerMalt;
+import beer.hoppyhour.api.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.yeast._1056AmericanAle;
 
 @Component
@@ -46,10 +54,16 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(Brewing.class)
 					.addAnnotatedClass(Scheduling.class)
 					.addAnnotatedClass(ToBrew.class)
+					.addAnnotatedClass(Ingredient.class)
+					.addAnnotatedClass(IngredientDetail.class)
 					.addAnnotatedClass(Malt.class)
 					.addAnnotatedClass(Hop.class)
 					.addAnnotatedClass(Yeast.class)
 					.addAnnotatedClass(OtherIngredient.class)
+					.addAnnotatedClass(HopDetail.class)
+					.addAnnotatedClass(MaltDetail.class)
+					.addAnnotatedClass(YeastDetail.class)
+					.addAnnotatedClass(OtherIngredientDetail.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -293,10 +307,144 @@ public class DatabaseLoader implements CommandLineRunner {
 				System.out.println("Saved some hops!");
 			} finally {
 				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Hop hopFromDB = session.get(Hop.class, Long.valueOf(10));
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+
+				HopDetail detail1 = getFakeHopDetail();
+				HopDetail detail2 = getFakeHopDetail();
+				HopDetail detail3 = getFakeHopDetail();
+
+				hopFromDB.addIngredientDetail(detail1);
+				hopFromDB.addIngredientDetail(detail2);
+				hopFromDB.addIngredientDetail(detail3);
+
+				recipeFromDB.addHopDetail(detail1);
+				recipeFromDB.addHopDetail(detail2);
+				recipeFromDB.addHopDetail(detail3);
+
+				session.save(detail1);
+				session.save(detail2);
+				session.save(detail3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some hop details!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Malt maltFromDB = session.get(Malt.class, Long.valueOf(1));
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+
+				MaltDetail detail1 = getFakeMaltDetail();
+				MaltDetail detail2 = getFakeMaltDetail();
+				MaltDetail detail3 = getFakeMaltDetail();
+
+				maltFromDB.addIngredientDetail(detail1);
+				maltFromDB.addIngredientDetail(detail2);
+				maltFromDB.addIngredientDetail(detail3);
+
+				recipeFromDB.addMaltDetail(detail1);
+				recipeFromDB.addMaltDetail(detail2);
+				recipeFromDB.addMaltDetail(detail3);
+
+				session.save(detail1);
+				session.save(detail2);
+				session.save(detail3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some malt details!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				OtherIngredient otherIngredientFromDB = session.get(OtherIngredient.class, Long.valueOf(7));
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+
+				OtherIngredientDetail detail1 = getFakeOtherIngredientDetail();
+				OtherIngredientDetail detail2 = getFakeOtherIngredientDetail();
+				OtherIngredientDetail detail3 = getFakeOtherIngredientDetail();
+
+				otherIngredientFromDB.addIngredientDetail(detail1);
+				otherIngredientFromDB.addIngredientDetail(detail2);
+				otherIngredientFromDB.addIngredientDetail(detail3);
+
+				recipeFromDB.addOtherIngredientDetail(detail1);
+				recipeFromDB.addOtherIngredientDetail(detail2);
+				recipeFromDB.addOtherIngredientDetail(detail3);
+
+				session.save(detail1);
+				session.save(detail2);
+				session.save(detail3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some other ingredient details!");
+			} finally {
+				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Yeast yeastFromDB = session.get(Yeast.class, Long.valueOf(4));
+				Recipe recipeFromDB = session.get(Recipe.class, id);
+
+				YeastDetail detail1 = getFakeYeastDetail();
+				YeastDetail detail2 = getFakeYeastDetail();
+				YeastDetail detail3 = getFakeYeastDetail();
+
+				yeastFromDB.addIngredientDetail(detail1);
+				yeastFromDB.addIngredientDetail(detail2);
+				yeastFromDB.addIngredientDetail(detail3);
+
+				recipeFromDB.addYeastDetail(detail1);
+				recipeFromDB.addYeastDetail(detail2);
+				recipeFromDB.addYeastDetail(detail3);
+
+				session.save(detail1);
+				session.save(detail2);
+				session.save(detail3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some yeast details!");
+			} finally {
+				session.close();
 				factory.close();
 			}
 		}
 
+	}
+	private OtherIngredientDetail getFakeOtherIngredientDetail() {
+		OtherIngredientDetail otherIngredientDetail = new OtherIngredientDetail(faker.number().randomDouble(2, 0, 10), null, faker.lorem().paragraph(), OtherIngredientPurposeType.SPICINESS);
+		return otherIngredientDetail;
+	}
+
+	private MaltDetail getFakeMaltDetail() {
+		MaltDetail maltDetail = new MaltDetail(null, faker.number().randomDouble(2, 0, 10), faker.lorem().paragraph());
+		return maltDetail;
+	}
+
+	private YeastDetail getFakeYeastDetail() {
+		YeastDetail yeastDetail = new YeastDetail(faker.number().randomDouble(2, 0, 10), null, faker.lorem().paragraph());
+		return yeastDetail;
+	}
+
+	private HopDetail getFakeHopDetail() {
+		HopDetail hopDetail = new HopDetail(faker.number().randomDouble(2, 0, 10), null, faker.lorem().paragraph(), HopPurposeType.AROMA);
+		return hopDetail;
 	}
 
 	private OtherIngredient getFakeOtherIngredient() {

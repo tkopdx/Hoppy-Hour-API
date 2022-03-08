@@ -4,11 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import beer.hoppyhour.api.model.Ingredient;
-
 @Entity
 @Table(name = "yeast")
-public class Yeast extends Ingredient {
+public class Yeast extends Ingredient<YeastDetail> {
     
     @Column(name = "type")
     private String type;

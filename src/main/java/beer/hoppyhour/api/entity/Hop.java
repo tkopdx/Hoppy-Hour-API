@@ -4,11 +4,9 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
-import beer.hoppyhour.api.model.Ingredient;
-
 @Entity
 @Table(name = "hop")
-public class Hop extends Ingredient {
+public class Hop extends Ingredient<HopDetail> {
     
     @Column(name = "stability")
     private String stability;

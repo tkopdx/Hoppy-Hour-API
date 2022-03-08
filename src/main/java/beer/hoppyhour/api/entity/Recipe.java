@@ -123,6 +123,42 @@ public class Recipe {
                 })
     private List<ToBrew> toBrews;
 
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<HopDetail> hopDetails;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<MaltDetail> maltDetails;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<YeastDetail> yeastDetails;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = {
+                    CascadeType.PERSIST,
+                    CascadeType.MERGE,
+                    CascadeType.DETACH,
+                    CascadeType.REFRESH
+                })
+    private List<OtherIngredientDetail> otherIngredientDetails;
+
     private Recipe() {}
 
     public Recipe(String name, Double originalGravity, Double finalGravity, String method,
@@ -327,5 +363,41 @@ public class Recipe {
 
         toBrews.add(toBrew);
         toBrew.setRecipe(this);
+    }
+
+    public void addHopDetail(HopDetail hopDetail) {
+        if (hopDetails == null) {
+            hopDetails = new ArrayList<>();
+        }
+
+        hopDetails.add(hopDetail);
+        hopDetail.setRecipe(this);
+    }
+
+    public void addMaltDetail(MaltDetail maltDetail) {
+        if (maltDetails == null) {
+            maltDetails = new ArrayList<>();
+        }
+
+        maltDetails.add(maltDetail);
+        maltDetail.setRecipe(this);
+    }
+
+    public void addYeastDetail(YeastDetail yeastDetail) {
+        if (yeastDetails == null) {
+            yeastDetails = new ArrayList<>();
+        }
+
+        yeastDetails.add(yeastDetail);
+        yeastDetail.setRecipe(this);
+    }
+
+    public void addOtherIngredientDetail(OtherIngredientDetail otherIngredientDetail) {
+        if (otherIngredientDetails == null) {
+            otherIngredientDetails = new ArrayList<>();
+        }
+
+        otherIngredientDetails.add(otherIngredientDetail);
+        otherIngredientDetail.setRecipe(this);
     }
 }
