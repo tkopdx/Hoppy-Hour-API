@@ -7,7 +7,7 @@ To run this on your own system, you'll need [Maven](https://maven.apache.org/) a
 ## Database structure
 The Hoppy Hour API uses Spring annotations to build the tables and relationships. For every table added, you need to also tell the SessionFactory that you built a new table by adding a .addAnnotatedClass(MyNewClass.class) to its configuration.
 
-![eer diagram of the database](https://github.com/tkopdx/Hoppy-Hour-API/blob/main/eerdiagram3-9-22.ong?raw=true)
+![eer diagram of the database](https://github.com/tkopdx/Hoppy-Hour-API/blob/main/eerdiagram3-9-22.png?raw=true)
 
 ## REST API
 
