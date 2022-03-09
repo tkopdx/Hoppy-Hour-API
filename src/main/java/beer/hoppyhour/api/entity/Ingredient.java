@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -14,8 +15,6 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
 @Entity
@@ -41,11 +40,6 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
             columnDefinition = "TEXT(10000)") //Inluding a max text length may be MySQL specific
     private String description;
 
-    // @JsonBackReference
-    //As of 3-8-22, ingredient details appear to be eagerly loading. With a small dataset, this is fine. 
-    //With a huge dataset (imagine how many details will be linked to a base malt after people start inputting recipes), this will be really slow.
-    //The default behavior should be lazy loading, but something seems to be overriding that default behavior.
-    //Uncommenting the above annotation and the partner annotation found in IngredientDetail appears to give the desired behavior
     @OneToMany(mappedBy = "ingredient",
                 cascade = {
                     CascadeType.PERSIST,
@@ -53,7 +47,8 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
                     CascadeType.DETACH,
                     CascadeType.REFRESH
                 },
-                targetEntity = IngredientDetail.class)
+                targetEntity = IngredientDetail.class,
+                fetch = FetchType.LAZY)
     private List<T> ingredientDetails;
 
     public Ingredient() {}

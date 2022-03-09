@@ -3,6 +3,7 @@ package beer.hoppyhour.api.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -11,8 +12,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "ingredient_detail")
@@ -42,14 +41,14 @@ public abstract class IngredientDetail<T extends IngredientDetail<T>> {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
-    // @JsonManagedReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
         CascadeType.DETACH,
         CascadeType.REFRESH
     },
-    targetEntity = Ingredient.class)
+    targetEntity = Ingredient.class,
+    fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_id")
     private Ingredient<T> ingredient;
 
