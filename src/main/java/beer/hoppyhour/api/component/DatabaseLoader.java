@@ -22,6 +22,7 @@ import beer.hoppyhour.api.entity.Malt;
 import beer.hoppyhour.api.entity.MaltDetail;
 import beer.hoppyhour.api.entity.OtherIngredient;
 import beer.hoppyhour.api.entity.OtherIngredientDetail;
+import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
@@ -64,6 +65,7 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(MaltDetail.class)
 					.addAnnotatedClass(YeastDetail.class)
 					.addAnnotatedClass(OtherIngredientDetail.class)
+					.addAnnotatedClass(Rating.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -422,11 +424,46 @@ public class DatabaseLoader implements CommandLineRunner {
 				System.out.println("Saved some yeast details!");
 			} finally {
 				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User user = session.get(User.class, id);
+				Recipe recipe = session.get(Recipe.class, id);
+
+				Rating rating1 = getFakeRating();
+				Rating rating2 = getFakeRating();
+				Rating rating3 = getFakeRating();
+
+				user.addRating(rating1);
+				user.addRating(rating2);
+				user.addRating(rating3);
+
+				recipe.addRating(rating1);
+				recipe.addRating(rating2);
+				recipe.addRating(rating3);
+
+				session.save(rating1);
+				session.save(rating2);
+				session.save(rating3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some yeast ratings!");
+			} finally {
+				session.close();
 				factory.close();
 			}
 		}
 
 	}
+
+	private Rating getFakeRating() {
+		Rating rating = new Rating(faker.number().numberBetween(0, 5));
+		return rating;
+	}
+
 	private OtherIngredientDetail getFakeOtherIngredientDetail() {
 		OtherIngredientDetail otherIngredientDetail = new OtherIngredientDetail(faker.number().randomDouble(2, 0, 10), null, faker.lorem().paragraph(), OtherIngredientPurposeType.SPICINESS);
 		return otherIngredientDetail;

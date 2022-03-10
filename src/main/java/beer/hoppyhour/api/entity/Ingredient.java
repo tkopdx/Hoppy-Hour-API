@@ -41,12 +41,7 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
     private String description;
 
     @OneToMany(mappedBy = "ingredient",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                },
+                cascade = CascadeType.ALL,
                 targetEntity = IngredientDetail.class,
                 fetch = FetchType.LAZY)
     private List<T> ingredientDetails;

@@ -27,7 +27,7 @@ All liquid volumes, weights, etc. are in metric unless otherwise noted. All temp
 ## Next moves:
 
 - [X] add ingredient tables
-- [ ] add ingredient_detail tables
+- [X] add ingredient_detail tables
 - [ ] add rating table
 - [ ] add comment table
 - [ ] add recipe_event table

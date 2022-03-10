@@ -54,49 +54,28 @@ public class User {
     private Long version;
 
     @OneToMany(mappedBy = "user",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Recipe> recipes;
 
     @OneToMany(mappedBy = "user",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Brewed> breweds;
 
     @OneToMany(mappedBy = "user",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Brewing> brewings;
 
     @OneToMany(mappedBy = "user",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Scheduling> schedulings;
 
     @OneToMany(mappedBy = "user",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<ToBrew> toBrews;
+
+    @OneToMany(mappedBy = "user",
+                cascade = CascadeType.ALL)
+    private List<Rating> ratings;
 
     public void setPassword(String password) {
         this.password = password; //TODO encrypt password
@@ -238,5 +217,14 @@ public class User {
 
         toBrews.add(toBrew);
         toBrew.setUser(this);
+    }
+
+    public void addRating(Rating rating) {
+        if (ratings == null) {
+            ratings = new ArrayList<>();
+        }
+
+        ratings.add(rating);
+        rating.setUser(this);
     }
 }

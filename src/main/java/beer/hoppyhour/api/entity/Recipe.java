@@ -88,76 +88,40 @@ public class Recipe {
     private User user;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Brewed> breweds;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Brewing> brewings;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<Scheduling> schedulings;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<ToBrew> toBrews;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<HopDetail> hopDetails;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<MaltDetail> maltDetails;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<YeastDetail> yeastDetails;
 
     @OneToMany(mappedBy = "recipe",
-                cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE,
-                    CascadeType.DETACH,
-                    CascadeType.REFRESH
-                })
+                cascade = CascadeType.ALL)
     private List<OtherIngredientDetail> otherIngredientDetails;
+
+    @OneToMany(mappedBy = "recipe",
+                cascade = CascadeType.ALL)
+    private List<Rating> ratings;
 
     private Recipe() {}
 
@@ -399,5 +363,14 @@ public class Recipe {
 
         otherIngredientDetails.add(otherIngredientDetail);
         otherIngredientDetail.setRecipe(this);
+    }
+
+    public void addRating(Rating rating) {
+        if (ratings == null) {
+            ratings = new ArrayList<>();
+        }
+
+        ratings.add(rating);
+        rating.setRecipe(this);
     }
 }
