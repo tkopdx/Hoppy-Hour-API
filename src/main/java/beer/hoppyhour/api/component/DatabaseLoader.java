@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import beer.hoppyhour.api.brand.WyeastType;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Brewing;
+import beer.hoppyhour.api.entity.Comment;
 import beer.hoppyhour.api.entity.Hop;
 import beer.hoppyhour.api.entity.HopDetail;
 import beer.hoppyhour.api.entity.Ingredient;
@@ -66,6 +67,7 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(YeastDetail.class)
 					.addAnnotatedClass(OtherIngredientDetail.class)
 					.addAnnotatedClass(Rating.class)
+					.addAnnotatedClass(Comment.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -450,13 +452,47 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.save(rating3);
 				session.getTransaction().commit();
 
-				System.out.println("Saved some yeast ratings!");
+				System.out.println("Saved some ratings!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User user = session.get(User.class, id);
+				Recipe recipe = session.get(Recipe.class, id);
+
+				Comment comment1 = getFakeComment();
+				Comment comment2 = getFakeComment();
+				Comment comment3 = getFakeComment();
+
+				user.addComment(comment1);
+				user.addComment(comment2);
+				user.addComment(comment3);
+
+				recipe.addComment(comment1);
+				recipe.addComment(comment2);
+				recipe.addComment(comment3);
+
+				session.save(comment1);
+				session.save(comment2);
+				session.save(comment3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some comments!");
 			} finally {
 				session.close();
 				factory.close();
 			}
 		}
 
+	}
+
+	private Comment getFakeComment() {
+		Comment comment = new Comment(faker.lorem().paragraph());
+		return comment;
 	}
 
 	private Rating getFakeRating() {

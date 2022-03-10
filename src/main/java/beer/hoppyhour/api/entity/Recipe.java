@@ -123,6 +123,10 @@ public class Recipe {
                 cascade = CascadeType.ALL)
     private List<Rating> ratings;
 
+    @OneToMany(mappedBy = "user",
+                cascade = CascadeType.ALL)
+    private List<Comment> comments;
+
     private Recipe() {}
 
     public Recipe(String name, Double originalGravity, Double finalGravity, String method,
@@ -372,5 +376,14 @@ public class Recipe {
 
         ratings.add(rating);
         rating.setRecipe(this);
+    }
+
+    public void addComment(Comment comment) {
+        if (comments == null) {
+            comments = new ArrayList<>();
+        }
+
+        comments.add(comment);
+        comment.setRecipe(this);
     }
 }

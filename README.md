@@ -28,8 +28,9 @@ All liquid volumes, weights, etc. are in metric unless otherwise noted. All temp
 
 - [X] add ingredient tables
 - [X] add ingredient_detail tables
-- [ ] add rating table
-- [ ] add comment table
+- [X] add rating table
+- [X] add comment table
+- [ ] add reply table
 - [ ] add recipe_event table
 - [ ] add place table
 - [ ] Add Spring Security to manage user passwords, roles, and secure data
