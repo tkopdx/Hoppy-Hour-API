@@ -81,6 +81,10 @@ public class User {
                 cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+    @OneToMany(mappedBy = "user",
+                cascade = CascadeType.ALL)
+    private List<Reply> replies;
+
     public void setPassword(String password) {
         this.password = password; //TODO encrypt password
     }
@@ -239,5 +243,14 @@ public class User {
 
         comments.add(comment);
         comment.setUser(this);
+    }
+
+    public void addReply(Reply reply) {
+        if (replies == null) {
+            replies = new ArrayList<>();
+        }
+
+        replies.add(reply);
+        reply.setUser(this);
     }
 }

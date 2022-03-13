@@ -25,6 +25,7 @@ import beer.hoppyhour.api.entity.OtherIngredient;
 import beer.hoppyhour.api.entity.OtherIngredientDetail;
 import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
+import beer.hoppyhour.api.entity.Reply;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
@@ -68,6 +69,7 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(OtherIngredientDetail.class)
 					.addAnnotatedClass(Rating.class)
 					.addAnnotatedClass(Comment.class)
+					.addAnnotatedClass(Reply.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -484,10 +486,73 @@ public class DatabaseLoader implements CommandLineRunner {
 				System.out.println("Saved some comments!");
 			} finally {
 				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User user = session.get(User.class, id);
+				Comment comment = session.get(Comment.class, Long.valueOf(25));
+
+				Reply reply1 = getFakeReply();
+				Reply reply2 = getFakeReply();
+				Reply reply3 = getFakeReply();
+
+				user.addReply(reply1);
+				user.addReply(reply2);
+				user.addReply(reply3);
+
+				comment.addReply(reply1);
+				comment.addReply(reply2);
+				comment.addReply(reply3);
+
+				session.save(reply1);
+				session.save(reply2);
+				session.save(reply3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some replies!");
+			} finally {
+				session.close();
+			}
+
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				User user = session.get(User.class, id);
+				Reply reply = session.get(Reply.class, Long.valueOf(28));
+
+				Reply reply1 = getFakeReply();
+				Reply reply2 = getFakeReply();
+				Reply reply3 = getFakeReply();
+
+				user.addReply(reply1);
+				user.addReply(reply2);
+				user.addReply(reply3);
+
+				reply.addReply(reply1);
+				reply.addReply(reply2);
+				reply.addReply(reply3);
+
+				session.save(reply1);
+				session.save(reply2);
+				session.save(reply3);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some replies to replies!");
+			} finally {
+				session.close();
 				factory.close();
 			}
 		}
 
+	}
+
+	private Reply getFakeReply() {
+		Reply reply = new Reply(faker.lorem().paragraph());
+		return reply;
 	}
 
 	private Comment getFakeComment() {
