@@ -1,7 +1,10 @@
 package beer.hoppyhour.api.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -16,6 +19,15 @@ public class Hop extends Ingredient<HopDetail> {
 
     @Column(name = "average_alpha_acid_high")
     private Double averageAlphaAcidHigh;
+
+    @ManyToOne(cascade = {
+        CascadeType.PERSIST,
+        CascadeType.MERGE,
+        CascadeType.DETACH,
+        CascadeType.REFRESH
+    })
+    @JoinColumn(name = "place_id")
+    private Place place;
 
     public Hop() {}
 
@@ -54,6 +66,14 @@ public class Hop extends Ingredient<HopDetail> {
 
     public void setAverageAlphaAcidHigh(Double averageAlphaAcidHigh) {
         this.averageAlphaAcidHigh = averageAlphaAcidHigh;
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
 
     

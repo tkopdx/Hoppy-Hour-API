@@ -24,6 +24,7 @@ import beer.hoppyhour.api.entity.Malt;
 import beer.hoppyhour.api.entity.MaltDetail;
 import beer.hoppyhour.api.entity.OtherIngredient;
 import beer.hoppyhour.api.entity.OtherIngredientDetail;
+import beer.hoppyhour.api.entity.Place;
 import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.RecipeEvent;
@@ -40,6 +41,7 @@ import beer.hoppyhour.api.hop.CentennialType;
 import beer.hoppyhour.api.hop.HopPurposeType;
 import beer.hoppyhour.api.malt.PilsnerMalt;
 import beer.hoppyhour.api.otheringredient.OtherIngredientPurposeType;
+import beer.hoppyhour.api.place.MunichType;
 import beer.hoppyhour.api.yeast._1056AmericanAle;
 
 @Component
@@ -76,6 +78,7 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(RecipeEvent.class)
 					.addAnnotatedClass(TemperatureRecipeEvent.class)
 					.addAnnotatedClass(IngredientDetailRecipeEvent.class)
+					.addAnnotatedClass(Place.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -120,6 +123,20 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.getTransaction().commit();
 
 				System.out.println("Done adding recipes!");
+			} finally {
+				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Place place = new Place(MunichType.COUNTRY, MunichType.CITY, MunichType.COORDINATES);
+				
+				session.save(place);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done adding places!");
 			} finally {
 				session.close();
 			}
@@ -320,7 +337,31 @@ public class DatabaseLoader implements CommandLineRunner {
 			} finally {
 				session.close();
 			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
 
+				long offset = 21 * (id - 1);
+
+				Hop hop = session.get(Hop.class, Long.valueOf(10 + offset));
+				Yeast yeast = session.get(Yeast.class, Long.valueOf(4 + offset));
+				Malt malt = session.get(Malt.class, Long.valueOf(1 + offset));
+				OtherIngredient other = session.get(OtherIngredient.class, Long.valueOf(7 + offset));
+				Recipe recipe = session.get(Recipe.class, Long.valueOf(1 + (3 * (id - 1))));
+				Place place = session.get(Place.class, Long.valueOf(id));
+
+				place.addHop(hop);
+				place.addMalt(malt);
+				place.addOtherIngredient(other);
+				place.addRecipe(recipe);
+				place.addYeast(yeast);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done linking hop, yeast, malt, other, recipe to place!");
+			} finally {
+				session.close();
+			}
 			session = factory.getCurrentSession();
 			try {
 				session.beginTransaction();

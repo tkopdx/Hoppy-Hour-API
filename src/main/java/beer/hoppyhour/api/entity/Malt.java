@@ -1,7 +1,10 @@
 package beer.hoppyhour.api.entity;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -13,6 +16,15 @@ public class Malt extends Ingredient<MaltDetail> {
 
     @Column(name = "malt_type")
     private String type;
+
+    @ManyToOne(cascade = {
+        CascadeType.PERSIST,
+        CascadeType.MERGE,
+        CascadeType.DETACH,
+        CascadeType.REFRESH
+    })
+    @JoinColumn(name = "place_id")
+    private Place place;
 
     public Malt(String name, String brand, String image, String description, String function, String type) {
         super(name, brand, image, description);
@@ -41,6 +53,14 @@ public class Malt extends Ingredient<MaltDetail> {
     @Override
     public String toString() {
         return "Malt [function=" + function + ", type=" + type + "]";
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
     
 }

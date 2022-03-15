@@ -132,6 +132,15 @@ public class Recipe {
     cascade = CascadeType.ALL)
     private List<RecipeEvent> events;
 
+    @ManyToOne(cascade = {
+        CascadeType.PERSIST,
+        CascadeType.MERGE,
+        CascadeType.DETACH,
+        CascadeType.REFRESH
+    })
+    @JoinColumn(name = "place_id")
+    private Place place;
+
     public Recipe() {}
 
     public Recipe(String name, Double originalGravity, Double finalGravity, String method,
@@ -399,5 +408,13 @@ public class Recipe {
 
         events.add(event);
         event.setRecipe(this);
+    }
+
+    public Place getPlace() {
+        return place;
+    }
+
+    public void setPlace(Place place) {
+        this.place = place;
     }
 }

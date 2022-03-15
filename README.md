@@ -32,5 +32,11 @@ All liquid volumes, weights, etc. are in metric unless otherwise noted. All temp
 - [X] add comment table
 - [X] add reply table
 - [X] add recipe_event table
-- [ ] add place table
+- [X] add place table
 - [ ] Add Spring Security to manage user passwords, roles, and secure data
+- [ ] Mess around and make tweaks
+- [ ] Add constant hops
+- [ ] Add constant malts
+- [ ] Add constant yeasts
+- [ ] Add constant other ingredients
+- [ ] Add constant brands
