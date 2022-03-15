@@ -1,11 +1,11 @@
 package beer.hoppyhour.api.entity;
 
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "hop_detail")
+@DiscriminatorValue("hop")
 public class HopDetail extends IngredientDetail<HopDetail> {
     
     @Column(name = "purpose")

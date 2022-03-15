@@ -19,14 +19,17 @@ import beer.hoppyhour.api.entity.Hop;
 import beer.hoppyhour.api.entity.HopDetail;
 import beer.hoppyhour.api.entity.Ingredient;
 import beer.hoppyhour.api.entity.IngredientDetail;
+import beer.hoppyhour.api.entity.IngredientDetailRecipeEvent;
 import beer.hoppyhour.api.entity.Malt;
 import beer.hoppyhour.api.entity.MaltDetail;
 import beer.hoppyhour.api.entity.OtherIngredient;
 import beer.hoppyhour.api.entity.OtherIngredientDetail;
 import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
+import beer.hoppyhour.api.entity.RecipeEvent;
 import beer.hoppyhour.api.entity.Reply;
 import beer.hoppyhour.api.entity.Scheduling;
+import beer.hoppyhour.api.entity.TemperatureRecipeEvent;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.Yeast;
@@ -70,6 +73,9 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(Rating.class)
 					.addAnnotatedClass(Comment.class)
 					.addAnnotatedClass(Reply.class)
+					.addAnnotatedClass(RecipeEvent.class)
+					.addAnnotatedClass(TemperatureRecipeEvent.class)
+					.addAnnotatedClass(IngredientDetailRecipeEvent.class)
 					.buildSessionFactory();
 
 			Session session = factory.getCurrentSession();
@@ -326,6 +332,10 @@ public class DatabaseLoader implements CommandLineRunner {
 				HopDetail detail2 = getFakeHopDetail();
 				HopDetail detail3 = getFakeHopDetail();
 
+				IngredientDetailRecipeEvent<HopDetail> hopEvent1 = new IngredientDetailRecipeEvent<HopDetail>(Long.valueOf(3500), "Adding the hops now will add bitterness", false);
+				IngredientDetailRecipeEvent<HopDetail> hopEvent2 = new IngredientDetailRecipeEvent<HopDetail>(Long.valueOf(300), "Aroma hops", false);
+				IngredientDetailRecipeEvent<HopDetail> hopEvent3 = new IngredientDetailRecipeEvent<HopDetail>(Long.valueOf(0), "Even more aroma", false);
+
 				hopFromDB.addIngredientDetail(detail1);
 				hopFromDB.addIngredientDetail(detail2);
 				hopFromDB.addIngredientDetail(detail3);
@@ -334,12 +344,20 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addHopDetail(detail2);
 				recipeFromDB.addHopDetail(detail3);
 
+				recipeFromDB.addEvent(hopEvent1);
+				recipeFromDB.addEvent(hopEvent2);
+				recipeFromDB.addEvent(hopEvent3);
+
+				detail1.setEvent(hopEvent1);
+				detail2.setEvent(hopEvent2);
+				detail3.setEvent(hopEvent3);
+
 				session.save(detail1);
 				session.save(detail2);
 				session.save(detail3);
 				session.getTransaction().commit();
 
-				System.out.println("Saved some hop details!");
+				System.out.println("Saved some hop details and events!");
 			} finally {
 				session.close();
 			}
@@ -355,6 +373,10 @@ public class DatabaseLoader implements CommandLineRunner {
 				MaltDetail detail2 = getFakeMaltDetail();
 				MaltDetail detail3 = getFakeMaltDetail();
 
+				IngredientDetailRecipeEvent<MaltDetail> maltEvent1 = new IngredientDetailRecipeEvent<MaltDetail>(Long.valueOf(1800), "Add extra DME", false);
+				IngredientDetailRecipeEvent<MaltDetail> maltEvent2 = new IngredientDetailRecipeEvent<MaltDetail>(Long.valueOf(7200), "Steep special malt #1 to get those proteins", false);
+				IngredientDetailRecipeEvent<MaltDetail> maltEvent3 = new IngredientDetailRecipeEvent<MaltDetail>(Long.valueOf(3600), "Add 90% of the DME", false);
+
 				maltFromDB.addIngredientDetail(detail1);
 				maltFromDB.addIngredientDetail(detail2);
 				maltFromDB.addIngredientDetail(detail3);
@@ -363,12 +385,20 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addMaltDetail(detail2);
 				recipeFromDB.addMaltDetail(detail3);
 
+				recipeFromDB.addEvent(maltEvent1);
+				recipeFromDB.addEvent(maltEvent2);
+				recipeFromDB.addEvent(maltEvent3);
+
+				detail1.setEvent(maltEvent1);
+				detail2.setEvent(maltEvent2);
+				detail3.setEvent(maltEvent3);
+
 				session.save(detail1);
 				session.save(detail2);
 				session.save(detail3);
 				session.getTransaction().commit();
 
-				System.out.println("Saved some malt details!");
+				System.out.println("Saved some malt details and events!");
 			} finally {
 				session.close();
 			}
@@ -384,6 +414,10 @@ public class DatabaseLoader implements CommandLineRunner {
 				OtherIngredientDetail detail2 = getFakeOtherIngredientDetail();
 				OtherIngredientDetail detail3 = getFakeOtherIngredientDetail();
 
+				IngredientDetailRecipeEvent<OtherIngredientDetail> otherEvent1 = new IngredientDetailRecipeEvent<OtherIngredientDetail>(Long.valueOf(3600), "Raise that pH", false);
+				IngredientDetailRecipeEvent<OtherIngredientDetail> otherEvent2 = new IngredientDetailRecipeEvent<OtherIngredientDetail>(Long.valueOf(-40000), "Get that chocolatiness", false);
+				IngredientDetailRecipeEvent<OtherIngredientDetail> otherEvent3 = new IngredientDetailRecipeEvent<OtherIngredientDetail>(Long.valueOf(-360000), "Sterilize your wort", false);
+
 				otherIngredientFromDB.addIngredientDetail(detail1);
 				otherIngredientFromDB.addIngredientDetail(detail2);
 				otherIngredientFromDB.addIngredientDetail(detail3);
@@ -392,12 +426,20 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addOtherIngredientDetail(detail2);
 				recipeFromDB.addOtherIngredientDetail(detail3);
 
+				recipeFromDB.addEvent(otherEvent1);
+				recipeFromDB.addEvent(otherEvent2);
+				recipeFromDB.addEvent(otherEvent3);
+
+				detail1.setEvent(otherEvent1);
+				detail2.setEvent(otherEvent2);
+				detail3.setEvent(otherEvent3);
+
 				session.save(detail1);
 				session.save(detail2);
 				session.save(detail3);
 				session.getTransaction().commit();
 
-				System.out.println("Saved some other ingredient details!");
+				System.out.println("Saved some other ingredient details and events!");
 			} finally {
 				session.close();
 			}
@@ -412,6 +454,10 @@ public class DatabaseLoader implements CommandLineRunner {
 				YeastDetail detail2 = getFakeYeastDetail();
 				YeastDetail detail3 = getFakeYeastDetail();
 
+				IngredientDetailRecipeEvent<YeastDetail> yeastEvent1 = new IngredientDetailRecipeEvent<YeastDetail>(Long.valueOf(0), "Wait for wort to drop below 24 C", true);
+				IngredientDetailRecipeEvent<YeastDetail> yeastEvent2 = new IngredientDetailRecipeEvent<YeastDetail>(Long.valueOf(-200), "Mix in a lager yeast", true);
+				IngredientDetailRecipeEvent<YeastDetail> yeastEvent3 = new IngredientDetailRecipeEvent<YeastDetail>(Long.valueOf(-4000), "A third and final yeast for good measure", true);
+
 				yeastFromDB.addIngredientDetail(detail1);
 				yeastFromDB.addIngredientDetail(detail2);
 				yeastFromDB.addIngredientDetail(detail3);
@@ -420,12 +466,20 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addYeastDetail(detail2);
 				recipeFromDB.addYeastDetail(detail3);
 
+				recipeFromDB.addEvent(yeastEvent1);
+				recipeFromDB.addEvent(yeastEvent2);
+				recipeFromDB.addEvent(yeastEvent3);
+
+				detail1.setEvent(yeastEvent1);
+				detail2.setEvent(yeastEvent2);
+				detail3.setEvent(yeastEvent3);
+
 				session.save(detail1);
 				session.save(detail2);
 				session.save(detail3);
 				session.getTransaction().commit();
 
-				System.out.println("Saved some yeast details!");
+				System.out.println("Saved some yeast details and events!!");
 			} finally {
 				session.close();
 			}
@@ -493,7 +547,7 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.beginTransaction();
 
 				User user = session.get(User.class, id);
-				Comment comment = session.get(Comment.class, Long.valueOf(25));
+				Comment comment = session.get(Comment.class, Long.valueOf(13));
 
 				Reply reply1 = getFakeReply();
 				Reply reply2 = getFakeReply();
@@ -522,7 +576,7 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.beginTransaction();
 
 				User user = session.get(User.class, id);
-				Reply reply = session.get(Reply.class, Long.valueOf(28));
+				Reply reply = session.get(Reply.class, Long.valueOf(16));
 
 				Reply reply1 = getFakeReply();
 				Reply reply2 = getFakeReply();
@@ -542,6 +596,34 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.getTransaction().commit();
 
 				System.out.println("Saved some replies to replies!");
+			} finally {
+				session.close();
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Recipe recipe = session.get(Recipe.class, id);
+
+				RecipeEvent noteEvent = new RecipeEvent(Long.valueOf(3600), faker.lorem().sentence(), true);
+
+				TemperatureRecipeEvent tempEvent1 = new TemperatureRecipeEvent(Long.valueOf(3400), "This temp makes everything taste good.", false, Double.valueOf(33.33));
+				TemperatureRecipeEvent tempEvent2 = new TemperatureRecipeEvent(Long.valueOf(300), "This temp makes everything taste bad.", false, Double.valueOf(50.33));
+				TemperatureRecipeEvent tempEvent3 = new TemperatureRecipeEvent(Long.valueOf(-10000), "This temp makes everything taste okay.", false, Double.valueOf(0.33));
+
+				recipe.addEvent(noteEvent);
+				recipe.addEvent(tempEvent1);
+				recipe.addEvent(tempEvent2);
+				recipe.addEvent(tempEvent3);
+
+				session.save(noteEvent);
+				session.save(tempEvent1);
+				session.save(tempEvent2);
+				session.save(tempEvent3);
+
+				session.getTransaction().commit();
+
+				System.out.println("Saved some recipe note and temperature events!");
 			} finally {
 				session.close();
 				factory.close();

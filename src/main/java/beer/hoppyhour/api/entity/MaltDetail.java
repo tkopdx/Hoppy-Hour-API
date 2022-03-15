@@ -1,10 +1,10 @@
 package beer.hoppyhour.api.entity;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "malt_detail")
+@DiscriminatorValue("malt")
 public class MaltDetail extends IngredientDetail<MaltDetail> {
     
     public MaltDetail(Double weight, Double liquidVolume, String notes) {

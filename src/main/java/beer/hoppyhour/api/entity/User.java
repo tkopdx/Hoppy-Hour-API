@@ -89,7 +89,7 @@ public class User {
         this.password = password; //TODO encrypt password
     }
 
-    private User() {}
+    public User() {}
     
     public User(String displayName, String email, String password) {
         this.displayName = displayName;

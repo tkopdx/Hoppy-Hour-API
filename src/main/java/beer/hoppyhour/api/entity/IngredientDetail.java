@@ -2,6 +2,9 @@ package beer.hoppyhour.api.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -11,15 +14,21 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.DiscriminatorOptions;
 
 @Entity
 @Table(name = "ingredient_detail")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "detail_type",
+    discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorOptions(force = true)
 public abstract class IngredientDetail<T extends IngredientDetail<T>> {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "weight")
@@ -51,6 +60,11 @@ public abstract class IngredientDetail<T extends IngredientDetail<T>> {
     fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_id")
     private Ingredient<T> ingredient;
+
+    @OneToOne(cascade = CascadeType.ALL,
+        targetEntity = IngredientDetailRecipeEvent.class)
+    @JoinColumn(name = "recipe_event_id", referencedColumnName = "id")
+    private IngredientDetailRecipeEvent<T> event;
 
     public IngredientDetail() {}
 
@@ -110,8 +124,17 @@ public abstract class IngredientDetail<T extends IngredientDetail<T>> {
 
     @Override
     public String toString() {
-        return "IngredientDetail [id=" + id + ", ingredient=" + ingredient + ", liquidVolume=" + liquidVolume
-                + ", notes=" + notes + ", recipe=" + recipe + ", weight=" + weight + "]";
+        return "IngredientDetail [event=" + event + ", id=" + id + ", ingredient=" + ingredient + ", liquidVolume="
+                + liquidVolume + ", notes=" + notes + ", recipe=" + recipe + ", weight=" + weight + "]";
+    }
+
+    public IngredientDetailRecipeEvent<T> getEvent() {
+        return event;
+    }
+
+    public void setEvent(IngredientDetailRecipeEvent<T> event) {
+        this.event = event;
+        event.setIngredientDetail(this);
     }
     
 }

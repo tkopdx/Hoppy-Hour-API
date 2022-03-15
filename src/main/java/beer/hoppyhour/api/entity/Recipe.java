@@ -2,6 +2,7 @@ package beer.hoppyhour.api.entity;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -127,7 +128,11 @@ public class Recipe {
                 cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    private Recipe() {}
+    @OneToMany(mappedBy = "recipe",
+    cascade = CascadeType.ALL)
+    private List<RecipeEvent> events;
+
+    public Recipe() {}
 
     public Recipe(String name, Double originalGravity, Double finalGravity, String method,
             String style, Double boilTime, Double batchSize, Double preBoilSize, Double postBoilSize,
@@ -385,5 +390,14 @@ public class Recipe {
 
         comments.add(comment);
         comment.setRecipe(this);
+    }
+
+    public void addEvent(RecipeEvent event) {
+        if (events == null) {
+            events = new LinkedList<>();
+        }
+
+        events.add(event);
+        event.setRecipe(this);
     }
 }
