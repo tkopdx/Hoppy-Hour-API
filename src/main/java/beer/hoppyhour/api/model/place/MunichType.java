@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.place;
+package beer.hoppyhour.api.model.place;
 
 public class MunichType {
     public static final String COUNTRY = "Germany";

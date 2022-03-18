@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.hop;
+package beer.hoppyhour.api.model.hop;
 
 public class HopStabilityType {
     public static final String EXCELLENT = "excellent";

@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.malt;
+package beer.hoppyhour.api.model.malt;
 
 public class MaltFunction {
     public static final String BASE = "base";

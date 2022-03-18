@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.malt;
+package beer.hoppyhour.api.model.malt;
 
 public class MaltType {
     public static final String PILSNER = "Pilsner";

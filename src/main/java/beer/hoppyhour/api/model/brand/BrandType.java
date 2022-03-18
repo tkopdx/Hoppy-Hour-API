@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.brand;
+package beer.hoppyhour.api.model.brand;
 
 public class BrandType {
     public static final String YEAST = "Yeast maker";

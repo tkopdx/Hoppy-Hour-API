@@ -2,16 +2,20 @@ package beer.hoppyhour.api.component;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import com.github.javafaker.Faker;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import beer.hoppyhour.api.brand.WyeastType;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Brewing;
 import beer.hoppyhour.api.entity.Comment;
@@ -29,32 +33,35 @@ import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.RecipeEvent;
 import beer.hoppyhour.api.entity.Reply;
+import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.TemperatureRecipeEvent;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.Yeast;
 import beer.hoppyhour.api.entity.YeastDetail;
-import beer.hoppyhour.api.hop.AmarilloType;
-import beer.hoppyhour.api.hop.CascadeType;
-import beer.hoppyhour.api.hop.CentennialType;
-import beer.hoppyhour.api.hop.HopPurposeType;
-import beer.hoppyhour.api.malt.PilsnerMalt;
-import beer.hoppyhour.api.otheringredient.OtherIngredientPurposeType;
-import beer.hoppyhour.api.place.MunichType;
-import beer.hoppyhour.api.yeast._1056AmericanAle;
+import beer.hoppyhour.api.model.ERole;
+import beer.hoppyhour.api.model.brand.WyeastType;
+import beer.hoppyhour.api.model.hop.AmarilloType;
+import beer.hoppyhour.api.model.hop.CascadeType;
+import beer.hoppyhour.api.model.hop.CentennialType;
+import beer.hoppyhour.api.model.hop.HopPurposeType;
+import beer.hoppyhour.api.model.malt.PilsnerMalt;
+import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
+import beer.hoppyhour.api.model.place.MunichType;
+import beer.hoppyhour.api.model.yeast._1056AmericanAle;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
 
+	@Autowired
+	PasswordEncoder encoder;
+
 	@Override
 	public void run(String... strings) throws Exception {
-		
-		
-		for (int i = 0; i <= 10; i++) {
-			SessionFactory factory = new Configuration()
+		SessionFactory factory = new Configuration()
 					.configure("hibernate.cfg.xml")
 					.addAnnotatedClass(User.class)
 					.addAnnotatedClass(Recipe.class)
@@ -79,16 +86,50 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(TemperatureRecipeEvent.class)
 					.addAnnotatedClass(IngredientDetailRecipeEvent.class)
 					.addAnnotatedClass(Place.class)
+					.addAnnotatedClass(Role.class)
 					.buildSessionFactory();
+		Session session = factory.getCurrentSession();
+		try {
+			session.beginTransaction();
 
-			Session session = factory.getCurrentSession();
+			Role role = session.get(Role.class, Long.valueOf(1));
+			if (role == null) {
+				Role userRole = new Role(ERole.ROLE_USER);
+				Role expertRole = new Role(ERole.ROLE_EXPERT);
+				Role adminRole = new Role(ERole.ROLE_ADMIN);
+				Role modRole = new Role(ERole.ROLE_MODERATOR);
+				
+				session.save(userRole);
+				session.save(expertRole);
+				session.save(adminRole);
+				session.save(modRole);
+				
+				session.getTransaction().commit();
+				
+				System.out.println("Saved roles!");
+			}
+
+			
+		} finally {
+			session.close();
+		}
+		
+		for (int i = 0; i <= 10; i++) {
+			
+			session = factory.getCurrentSession();
 			Long id;
 			try {
-				// create the objects
-				User user = getFakeUser();
-
 				// start transaction
 				session.beginTransaction();
+
+				Long roleId = Long.valueOf(faker.number().numberBetween(1, 4)); 
+				//get random role
+				Set<Role> roles = new HashSet<>();
+				Role role = session.get(Role.class, roleId);
+				roles.add(role);
+
+				// create the objects
+				User user = getFakeUser(roles);
 
 				// save the recipe and user
 				System.out.println("Saving the user...");
@@ -97,7 +138,7 @@ public class DatabaseLoader implements CommandLineRunner {
 				// commit
 				session.getTransaction().commit();
 
-				System.out.println("Done adding user!");
+				System.out.println("Done adding users!");
 
 			} finally {
 				session.close();
@@ -667,10 +708,9 @@ public class DatabaseLoader implements CommandLineRunner {
 				System.out.println("Saved some recipe note and temperature events!");
 			} finally {
 				session.close();
-				factory.close();
 			}
 		}
-
+		factory.close();
 	}
 
 	private Reply getFakeReply() {
@@ -723,8 +763,9 @@ public class DatabaseLoader implements CommandLineRunner {
 		return malt;
 	}
 
-	private User getFakeUser() {
-		User user = new User(faker.name().username(), faker.internet().emailAddress(), "password");
+	private User getFakeUser(Set<Role> roles) {
+		User user = new User(faker.name().username(), faker.internet().emailAddress(), encoder.encode("password"));
+		user.setRoles(roles);
 		return user;
 	}
 

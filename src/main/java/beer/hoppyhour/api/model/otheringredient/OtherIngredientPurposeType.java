@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.otheringredient;
+package beer.hoppyhour.api.model.otheringredient;
 
 public class OtherIngredientPurposeType {
     public static final String RAISEPH = "raise pH";

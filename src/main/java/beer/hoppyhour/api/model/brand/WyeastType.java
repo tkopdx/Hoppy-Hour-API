@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.brand;
+package beer.hoppyhour.api.model.brand;
 
 public class WyeastType {
     public static final String NAME = "Wyeast Labratories, Inc.";

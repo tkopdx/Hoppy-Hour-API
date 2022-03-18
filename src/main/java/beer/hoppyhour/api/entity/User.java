@@ -3,18 +3,27 @@ package beer.hoppyhour.api.entity;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,7 +31,11 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user",
+        uniqueConstraints = {
+            @UniqueConstraint(columnNames = "username"),
+            @UniqueConstraint(columnNames = "email")
+        })
 public class User {
 
     @Id
@@ -30,14 +43,26 @@ public class User {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "display_name")
-    private String displayName;
+    @NotBlank
+    @Size(max = 20)
+    @Column(name = "username", 
+        nullable = false,
+        length = 20)
+    private String username;
     
-    @Column(name = "email")
+    @NotBlank
+    @Size(max = 50)
+    @Column(name = "email",
+        nullable = false,
+        length = 50)
     private String email;
     
+    @NotBlank
     @JsonIgnore
-    @Column(name = "password")
+    @Size(min = 6, max = 120)
+    @Column(name = "password",
+        nullable = false,
+        length = 120)
     private String password;
 
     @CreationTimestamp
@@ -52,6 +77,12 @@ public class User {
     @JsonIgnore
     @Column(name = "version")
     private Long version;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id"))
+    private Set<Role> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
@@ -91,8 +122,8 @@ public class User {
 
     public User() {}
     
-    public User(String displayName, String email, String password) {
-        this.displayName = displayName;
+    public User(String username, String email, String password) {
+        this.username = username;
         this.email = email;
         this.setPassword(password);
     }
@@ -103,7 +134,7 @@ public class User {
 		if (o == null || getClass() != o.getClass()) return false;
 		User User = (User) o;
 		return Objects.equals(id, User.id) &&
-			Objects.equals(displayName, User.displayName) &&
+			Objects.equals(username, User.username) &&
 			Objects.equals(email, User.email) &&
             // Arrays.equals(roles, User.roles) &&
             Objects.equals(createdDate, User.createdDate) &&
@@ -113,17 +144,17 @@ public class User {
 	@Override
 	public int hashCode() {
 
-		int result = Objects.hash(id, displayName, email, password);
+		int result = Objects.hash(id, username, email, password);
         result = 31 * result;
         return result;
 	}
 
-    public String getDisplayName() {
-        return displayName;
+    public String getUsername() {
+        return username;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
@@ -168,7 +199,7 @@ public class User {
 
 	@Override
     public String toString() {
-        return "User [createdDate=" + createdDate + ", displayName=" + displayName + ", email=" + email + ", id=" + id
+        return "User [createdDate=" + createdDate + ", username=" + username + ", email=" + email + ", id=" + id
                 + ", password=" + password + " updatedDate=" + updatedDate + ", version="
                 + version + "]";
     }
@@ -252,5 +283,13 @@ public class User {
 
         replies.add(reply);
         reply.setUser(this);
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
     }
 }

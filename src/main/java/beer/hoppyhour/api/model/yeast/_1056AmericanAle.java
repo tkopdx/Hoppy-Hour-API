@@ -1,6 +1,6 @@
-package beer.hoppyhour.api.yeast;
+package beer.hoppyhour.api.model.yeast;
 
-import beer.hoppyhour.api.brand.WyeastType;
+import beer.hoppyhour.api.model.brand.WyeastType;
 
 public class _1056AmericanAle {
     public static final String NAME = "American Ale";

@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.yeast;
+package beer.hoppyhour.api.model.yeast;
 
 public class FlocullationType {
     public static final String LOW = "Low";

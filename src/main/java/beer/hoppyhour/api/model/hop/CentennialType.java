@@ -1,4 +1,4 @@
-package beer.hoppyhour.api.hop;
+package beer.hoppyhour.api.model.hop;
 
 public class CentennialType {
     public static final String NAME = "Centennial";
