@@ -50,8 +50,8 @@ import beer.hoppyhour.api.model.malt.PilsnerMalt;
 import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
-
-@Component
+//Uncomment and run main method to populate your database. Comment out again on subsequent main runs.
+// @Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();

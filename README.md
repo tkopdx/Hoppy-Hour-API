@@ -7,7 +7,7 @@ To run this on your own system, you'll need [Maven](https://maven.apache.org/) a
 ## Database structure
 The Hoppy Hour API uses Spring annotations to build the tables and relationships. For every table added, you need to also tell the SessionFactory that you built a new table by adding a .addAnnotatedClass(MyNewClass.class) to its configuration.
 
-![eer diagram of the database](https://github.com/tkopdx/Hoppy-Hour-API/blob/main/er_diagram_3-15-22.png?raw=true)
+![eer diagram of the database](https://github.com/tkopdx/Hoppy-Hour-API/blob/main/er_diagram_3-18-22.png?raw=true)
 
 ## REST API
 
@@ -26,6 +26,8 @@ All liquid volumes, weights, etc. are in metric unless otherwise noted. All temp
 
 ## Next moves:
 
+See [here](https://github.com/NoahSylwester/Hoppy-Hour/projects) for a full list of Hoppy Hour to-dos.
+
 - [X] add ingredient tables
 - [X] add ingredient_detail tables
 - [X] add rating table
@@ -33,7 +35,8 @@ All liquid volumes, weights, etc. are in metric unless otherwise noted. All temp
 - [X] add reply table
 - [X] add recipe_event table
 - [X] add place table
-- [ ] Add Spring Security to manage user passwords, roles, and secure data
+- [X] Add Spring Security to manage user passwords, roles, and secure data
+- [ ] Write rules for CRUD operations in tables
 - [ ] Mess around and make tweaks
 - [ ] Add constant hops
 - [ ] Add constant malts

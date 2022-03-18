@@ -1,10 +1,8 @@
 package beer.hoppyhour.api.doa;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 import beer.hoppyhour.api.entity.User;
@@ -17,21 +15,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmail(String email);
     
     @Override
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    List<User> findAll();
-    
-    @Override
-    @PreAuthorize("#user.name == authentication?.name or hasRole('ROLE_ADMIN')")
-    void delete(User entity);
-    
-    @Override
-    @PreAuthorize("@userRepository.findById(#id)?.user?.name == authentication?.name or hasRole('ROLE_ADMIN')")
-    void deleteById(Long id);
-    
-    @Override
-    @PreAuthorize("@userRepository.findById(#id)?.user?.name == authentication?.name or hasRole('ROLE_ADMIN')")
+    //Before allowing client to execute findById, checks to see if the id parameter in the request matches the id of the currently logged in account.
+    @PreAuthorize("#id == authentication.principal.id")
     Optional<User> findById(Long id);
     
-    // @PreAuthorize("#user.name == authentication?.name or hasRole('ROLE_ADMIN')")
-    // <S extends User> S save(@Param("user") User entity);
+    
 }
