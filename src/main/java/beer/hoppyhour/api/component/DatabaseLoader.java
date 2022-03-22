@@ -3,7 +3,6 @@ package beer.hoppyhour.api.component;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import com.github.javafaker.Faker;
@@ -764,7 +763,7 @@ public class DatabaseLoader implements CommandLineRunner {
 	}
 
 	private User getFakeUser(Set<Role> roles) {
-		User user = new User(faker.name().username(), faker.internet().emailAddress(), encoder.encode("password"));
+		User user = new User(faker.name().username(), encoder.encode(faker.internet().emailAddress()), encoder.encode("password"));
 		user.setRoles(roles);
 		return user;
 	}

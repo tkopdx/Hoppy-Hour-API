@@ -18,6 +18,9 @@ import beer.hoppyhour.api.security.jwt.AuthEntryPointJwt;
 import beer.hoppyhour.api.security.jwt.AuthTokenFilter;
 import beer.hoppyhour.api.security.services.UserDetailsServiceImpl;
 
+//TODO refresh JWT tokens
+//TODO XSS attacks
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -62,6 +65,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/test/**").permitAll()
+                .antMatchers("/api/users/**/public").permitAll()
+                .antMatchers("/api/users").denyAll()
                 .anyRequest().authenticated();
         http
             .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -51,10 +51,10 @@ public class User {
     private String username;
     
     @NotBlank
-    @Size(max = 50)
+    @Size(max = 120)
     @Column(name = "email",
         nullable = false,
-        length = 50)
+        length = 120)
     private String email;
     
     @NotBlank

@@ -1,7 +1,7 @@
 package beer.hoppyhour.api.controller;
 
 import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,19 +56,27 @@ public class AuthController {
         
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Optional<User> user = userRepository.findById(userDetails.getId());
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-        List<String> roles = userDetails.getAuthorities().stream()
+        Set<String> roles = userDetails.getAuthorities().stream()
                             .map(item -> item.getAuthority())
-                            .collect(Collectors.toList());
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(
-                    new UserInfoResponse(
-                        userDetails.getId(), 
-                        userDetails.getUsername(), 
-                        userDetails.getEmail(), 
-                        roles
-                    )
-                );
+                            .collect(Collectors.toSet());
+        if (user == null) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: No user found with id " + userDetails.getId()));
+        } else {
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+            .body(
+                new UserInfoResponse(
+                    userDetails.getId(), 
+                    userDetails.getUsername(), 
+                    userDetails.getEmail(),
+                    user.get().getCreatedDate(),
+                    user.get().getupdatedDate(), 
+                    roles
+                )
+            );
+        }
+             
     }
 
     @PostMapping("/signup")
@@ -84,7 +92,7 @@ public class AuthController {
 
         //Create the user if not found
         User user = new User(signupRequest.getUsername(), 
-                    signupRequest.getEmail(), 
+                    passwordEncoder.encode(signupRequest.getEmail()), 
                     passwordEncoder.encode(signupRequest.getPassword()));
         Set<String> strRoles = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
