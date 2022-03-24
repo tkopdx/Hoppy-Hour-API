@@ -120,7 +120,7 @@ public class AuthController {
         User user = verificationToken.getUser();
         Calendar calendar = Calendar.getInstance();
         if ((verificationToken.getExpiryDate().getTime() - calendar.getTime().getTime()) <= 0) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Your token is expired."));
+            return ResponseEntity.badRequest().body(new MessageResponse("Your token is expired. Click the Resend Verification link in the expired email to get another verification email."));
         }
 
         user.setEnabled(true);
@@ -133,5 +133,23 @@ public class AuthController {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out! Have a nice day."));
+    }
+
+    @GetMapping("/resendRegistrationToken")
+    public ResponseEntity<?> resendRegistrationToken(HttpServletRequest request, @RequestParam("token") String existingToken) {
+        try {
+            //Generate a new token
+            VerificationToken newToken = authService.generateNewVerificationToken(existingToken);
+            //Get user for later email usage
+            User user = authService.getUserByToken(newToken.getToken());
+            //Construct email and send
+            authService.resendVerificationEmail(user, newToken);
+            //If all goes well, delete the existing token
+            authService.deleteVerificationToken(existingToken);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+        
+        return ResponseEntity.ok().body(new MessageResponse("A new verification email has been sent! Please verify within 24 hours."));
     }
 }
