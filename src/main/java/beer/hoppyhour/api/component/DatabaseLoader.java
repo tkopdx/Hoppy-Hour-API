@@ -50,7 +50,7 @@ import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
 //Uncomment and run main method to populate your database. Comment out again on subsequent main runs.
-// @Component
+@Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
@@ -180,20 +180,20 @@ public class DatabaseLoader implements CommandLineRunner {
 			} finally {
 				session.close();
 			}
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
+			// session = factory.getCurrentSession();
+			// try {
+			// 	session.beginTransaction();
 
-				User userFromDB = session.get(User.class, id);
-				System.out.println("USER: " + userFromDB);
-				System.out.println("RECIPES: " + userFromDB.getRecipes());
+			// 	User userFromDB = session.get(User.class, id);
+			// 	System.out.println("USER: " + userFromDB);
+			// 	System.out.println("RECIPES: " + userFromDB.getRecipes());
 
-				session.getTransaction().commit();
+			// 	session.getTransaction().commit();
 
-				System.out.println("Done showing you!");
-			} finally {
-				session.close();
-			}
+			// 	System.out.println("Done showing you!");
+			// } finally {
+			// 	session.close();
+			// }
 			session = factory.getCurrentSession();
 			try {
 				session.beginTransaction();

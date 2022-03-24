@@ -75,6 +75,7 @@ public class UserController {
             repository.save(user);
             return ResponseEntity.ok().body(
                 new MessageResponse(
+                    //first send a verification email before updating their email in the database
                     "Your email has been updated."
                 )
             );

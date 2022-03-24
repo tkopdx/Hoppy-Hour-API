@@ -78,6 +78,9 @@ public class User {
     @Column(name = "version")
     private Long version;
 
+    @Column(name = "enabled")
+    private boolean enabled;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
@@ -126,6 +129,7 @@ public class User {
         this.username = username;
         this.email = email;
         this.setPassword(password);
+        this.enabled = false;
     }
 
     @Override
@@ -199,9 +203,11 @@ public class User {
 
 	@Override
     public String toString() {
-        return "User [createdDate=" + createdDate + ", username=" + username + ", email=" + email + ", id=" + id
-                + ", password=" + password + " updatedDate=" + updatedDate + ", version="
-                + version + "]";
+        return "User [breweds=" + breweds + ", brewings=" + brewings + ", comments=" + comments + ", createdDate="
+                + createdDate + ", email=" + email + ", enabled=" + enabled + ", id=" + id + ", password=" + password
+                + ", ratings=" + ratings + ", recipes=" + recipes + ", replies=" + replies + ", roles=" + roles
+                + ", schedulings=" + schedulings + ", toBrews=" + toBrews + ", updatedDate=" + updatedDate
+                + ", username=" + username + ", version=" + version + "]";
     }
 
     public List<Recipe> getRecipes() {
@@ -291,5 +297,13 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

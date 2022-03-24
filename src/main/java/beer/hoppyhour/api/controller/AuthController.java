@@ -1,13 +1,14 @@
 package beer.hoppyhour.api.controller;
 
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.Calendar;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -15,24 +16,27 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.RoleRepository;
 import beer.hoppyhour.api.doa.UserRepository;
-import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.User;
-import beer.hoppyhour.api.model.ERole;
+import beer.hoppyhour.api.entity.VerificationToken;
 import beer.hoppyhour.api.payload.request.LoginRequest;
 import beer.hoppyhour.api.payload.request.SignupRequest;
 import beer.hoppyhour.api.payload.response.MessageResponse;
 import beer.hoppyhour.api.payload.response.UserInfoResponse;
+import beer.hoppyhour.api.registration.OnRegistrationCompleteEvent;
 import beer.hoppyhour.api.security.jwt.JwtUtils;
 import beer.hoppyhour.api.security.services.UserDetailsImpl;
+import beer.hoppyhour.api.service.AuthService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -45,89 +49,83 @@ public class AuthController {
     @Autowired
     RoleRepository roleRepository;
     @Autowired
-    PasswordEncoder passwordEncoder;
-    @Autowired
     JwtUtils jwtUtils;
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
+    @Autowired
+    AuthService authService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
-            .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
+                        loginRequest.getPassword()));
+
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        Optional<User> user = userRepository.findById(userDetails.getId());
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        try {
+            User user = authService.findUserById(userDetails.getId());
+
+            ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         Set<String> roles = userDetails.getAuthorities().stream()
-                            .map(item -> item.getAuthority())
-                            .collect(Collectors.toSet());
-        if (user == null) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: No user found with id " + userDetails.getId()));
-        } else {
-            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-            .body(
-                new UserInfoResponse(
-                    userDetails.getId(), 
-                    userDetails.getUsername(), 
-                    userDetails.getEmail(),
-                    user.get().getCreatedDate(),
-                    user.get().getupdatedDate(), 
-                    roles
-                )
-            );
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toSet());
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(
+                        new UserInfoResponse(
+                                userDetails.getId(),
+                                userDetails.getUsername(),
+                                userDetails.getEmail(),
+                                user.getCreatedDate(),
+                                user.getupdatedDate(),
+                                roles));
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
-             
+
     }
 
+    // the flow for user registration
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
-        
-        //Check database for duplicates and throw errors if found
-        if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username '" + signupRequest.getUsername() + "' is already taken!"));
+    public ResponseEntity<?> registerNewUser(@Valid @RequestBody SignupRequest signupRequest,
+            HttpServletRequest request) {
+        try {
+            // save the new user info in the database. It is not yet enabled.
+            User registered = authService.persistNewUser(signupRequest);
+            String apiUrl = request.getContextPath();
+            // start an event listener that sends an email with a verification token once
+            // notified that the user info has been saved.
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(
+                    apiUrl,
+                    request.getLocale(),
+                    registered));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email '" + signupRequest.getEmail() + "' is already associated with another account!"));
+        // user info successfully saved and email sent, but user is not yet enabled
+        return ResponseEntity
+                .ok(new MessageResponse("User registered successfully! Please verify your email within 24 hours."));
+    }
+
+    @GetMapping("/registrationConfirm")
+    public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
+        // Locale locale = request.getLocale();
+
+        VerificationToken verificationToken = authService.getVerificationToken(token);
+        if (verificationToken == null) {
+            // throw error
+            return ResponseEntity.badRequest().body(new MessageResponse("Your token is invalid."));
         }
 
-        //Create the user if not found
-        User user = new User(signupRequest.getUsername(), 
-                    passwordEncoder.encode(signupRequest.getEmail()), 
-                    passwordEncoder.encode(signupRequest.getPassword()));
-        Set<String> strRoles = signupRequest.getRoles();
-        Set<Role> roles = new HashSet<>();
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                            .orElseThrow(() -> throwRoleNotFound());
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
-                                        .orElseThrow(() -> throwRoleNotFound());
-                        roles.add(adminRole);
-                        break;
-                    case "expert":
-                        Role expertRole = roleRepository.findByName(ERole.ROLE_EXPERT)
-                                        .orElseThrow(() -> throwRoleNotFound());
-                        roles.add(expertRole);
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR)
-                                        .orElseThrow( () -> throwRoleNotFound());
-                        roles.add(modRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER)
-                                        .orElseThrow(() -> throwRoleNotFound());
-                        roles.add(userRole);
-                }
-            });
+        User user = verificationToken.getUser();
+        Calendar calendar = Calendar.getInstance();
+        if ((verificationToken.getExpiryDate().getTime() - calendar.getTime().getTime()) <= 0) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Your token is expired."));
         }
-        user.setRoles(roles);
-        userRepository.save(user);
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+
+        user.setEnabled(true);
+        authService.saveRegisteredUser(user);
+        return ResponseEntity.ok(new MessageResponse("Your email has been successfully verified. Cheers!"));
     }
 
     @PostMapping("/signout")
@@ -135,10 +133,5 @@ public class AuthController {
         ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out! Have a nice day."));
-    }
-
-    private RuntimeException throwRoleNotFound() {
-        RuntimeException e = new RuntimeException("Error: Role is not found.");
-        return e;
     }
 }
