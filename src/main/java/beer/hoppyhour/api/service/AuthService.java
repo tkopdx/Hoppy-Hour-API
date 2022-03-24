@@ -26,8 +26,6 @@ import beer.hoppyhour.api.model.ERole;
 import beer.hoppyhour.api.payload.request.SignupRequest;
 import io.jsonwebtoken.io.Encoders;
 
-//TODO refresh verification tokens
-
 @Service
 public class AuthService implements IAuthService {
     @Autowired
@@ -171,7 +169,7 @@ public class AuthService implements IAuthService {
 
     @Override
     @Transactional
-    public void deleteVerificationToken(String token) {
-        tokenRepository.deleteByToken(token);
+    public int deleteVerificationToken(String token) {
+        return tokenRepository.deleteByToken(token);
     }
 }

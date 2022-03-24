@@ -27,14 +27,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.RoleRepository;
 import beer.hoppyhour.api.doa.UserRepository;
+import beer.hoppyhour.api.entity.RefreshToken;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.VerificationToken;
+import beer.hoppyhour.api.exception.TokenRefreshException;
 import beer.hoppyhour.api.payload.request.LoginRequest;
 import beer.hoppyhour.api.payload.request.SignupRequest;
+import beer.hoppyhour.api.payload.request.TokenRefreshRequest;
+import beer.hoppyhour.api.payload.response.JwtResponse;
 import beer.hoppyhour.api.payload.response.MessageResponse;
-import beer.hoppyhour.api.payload.response.UserInfoResponse;
+import beer.hoppyhour.api.payload.response.TokenRefreshResponse;
 import beer.hoppyhour.api.registration.OnRegistrationCompleteEvent;
 import beer.hoppyhour.api.security.jwt.JwtUtils;
+import beer.hoppyhour.api.security.services.RefreshTokenService;
 import beer.hoppyhour.api.security.services.UserDetailsImpl;
 import beer.hoppyhour.api.service.AuthService;
 
@@ -54,6 +59,8 @@ public class AuthController {
     ApplicationEventPublisher eventPublisher;
     @Autowired
     AuthService authService;
+    @Autowired
+    RefreshTokenService refreshTokenService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -64,25 +71,53 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         try {
-            User user = authService.findUserById(userDetails.getId());
 
+            //Alter JwtResponse and use this user object if you need more user info sent back to client
+            // User user = authService.findUserById(userDetails.getId());
+
+            //Build a jwt
             ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
-        Set<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
-                .collect(Collectors.toSet());
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .body(
-                        new UserInfoResponse(
-                                userDetails.getId(),
-                                userDetails.getUsername(),
-                                userDetails.getEmail(),
-                                user.getCreatedDate(),
-                                user.getupdatedDate(),
-                                roles));
+            //delete any previous refresh tokens
+            refreshTokenService.clearPreviousToken(userRepository.getById(userDetails.getId()));
+            //create a new refresh token
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+            Set<String> roles = userDetails.getAuthorities().stream()
+                    .map(item -> item.getAuthority())
+                    .collect(Collectors.toSet());
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(
+                            new JwtResponse(
+                                refreshToken.getToken(), 
+                                userDetails.getId(), 
+                                userDetails.getUsername(), 
+                                userDetails.getEmail(), 
+                                roles)
+                    );
         } catch (UsernameNotFoundException e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }
 
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
+        try {
+            String refreshToken = request.getRefreshToken();
+            RefreshToken token = refreshTokenService.findByToken(refreshToken)
+                                .orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token is not in the database!"));
+            token = refreshTokenService.verifyExpiration(token);
+            User user = token.getUser();
+            String jwtString = jwtUtils.generateTokenFromUsername(user.getUsername());
+            ResponseCookie cookie = jwtUtils.getRefreshedJwtCookie(jwtString);
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+                        .body(
+                            new TokenRefreshResponse(
+                                refreshToken
+                            )
+                        );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // the flow for user registration

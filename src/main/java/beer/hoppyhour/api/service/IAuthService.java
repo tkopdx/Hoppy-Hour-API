@@ -10,7 +10,7 @@ public interface IAuthService {
     void saveRegisteredUser(User user);
     VerificationToken getVerificationToken(String token);
     VerificationToken createVerificationToken(User user, String token);
-    void deleteVerificationToken(String token);
+    int deleteVerificationToken(String token);
     VerificationToken generateNewVerificationToken(String previousToken);
     User getUserByToken(String token);
     void resendVerificationEmail(User user, VerificationToken token);

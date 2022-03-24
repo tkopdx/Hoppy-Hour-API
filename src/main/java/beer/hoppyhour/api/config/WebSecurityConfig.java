@@ -18,7 +18,6 @@ import beer.hoppyhour.api.security.jwt.AuthEntryPointJwt;
 import beer.hoppyhour.api.security.jwt.AuthTokenFilter;
 import beer.hoppyhour.api.security.services.UserDetailsServiceImpl;
 
-//TODO refresh JWT tokens
 //TODO XSS attacks
 
 @Configuration

@@ -46,17 +46,21 @@ public class UserController {
         if (user.isEmpty()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: No user found with id " + id + "."));
         } else {
-            Set<String> strRoles = authentication.getAuthorities().stream().map(r -> r.toString()).collect(Collectors.toSet());
+            try {
+                Set<String> strRoles = authentication.getAuthorities().stream().map(r -> r.toString()).collect(Collectors.toSet());
 
-            return ResponseEntity.ok().body(
-                new UserInfoResponse(
-                    user.get().getId(), 
-                    user.get().getUsername(), 
-                    user.get().getEmail(), 
-                    user.get().getCreatedDate(), 
-                    user.get().getupdatedDate(), 
-                    strRoles)
-                );
+                return ResponseEntity.ok().body(
+                    new UserInfoResponse(
+                        user.get().getId(), 
+                        user.get().getUsername(), 
+                        user.get().getEmail(), 
+                        user.get().getCreatedDate(), 
+                        user.get().getupdatedDate(), 
+                        strRoles)
+                    );
+            } catch (Exception e) {
+                return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+            }
         }
     }
 

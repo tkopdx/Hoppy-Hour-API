@@ -120,7 +120,7 @@ public class User {
     private List<Reply> replies;
 
     public void setPassword(String password) {
-        this.password = password; //TODO encrypt password
+        this.password = password;
     }
 
     public User() {}

@@ -36,6 +36,7 @@ See [here](https://github.com/NoahSylwester/Hoppy-Hour/projects) for a full list
 - [X] add recipe_event table
 - [X] add place table
 - [X] Add Spring Security to manage user passwords, roles, and secure data
+- [X] Email verification
 - [ ] Write rules for CRUD operations in tables
 - [ ] Mess around and make tweaks
 - [ ] Add constant hops
