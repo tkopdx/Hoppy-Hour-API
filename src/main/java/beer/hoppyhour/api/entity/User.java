@@ -26,6 +26,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -87,6 +88,7 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
     private List<Recipe> recipes;
@@ -171,10 +173,6 @@ public class User {
 
     public Timestamp getCreatedDate() {
         return createdDate;
-    }
-
-    public Timestamp getupdatedDate() {
-        return updatedDate;
     }
 
     public void setUpdatedDate(Timestamp updatedDate) {
@@ -305,5 +303,69 @@ public class User {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Timestamp getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public List<Brewed> getBreweds() {
+        return breweds;
+    }
+
+    public void setBreweds(List<Brewed> breweds) {
+        this.breweds = breweds;
+    }
+
+    public List<Brewing> getBrewings() {
+        return brewings;
+    }
+
+    public void setBrewings(List<Brewing> brewings) {
+        this.brewings = brewings;
+    }
+
+    public List<Scheduling> getSchedulings() {
+        return schedulings;
+    }
+
+    public void setSchedulings(List<Scheduling> schedulings) {
+        this.schedulings = schedulings;
+    }
+
+    public List<ToBrew> getToBrews() {
+        return toBrews;
+    }
+
+    public void setToBrews(List<ToBrew> toBrews) {
+        this.toBrews = toBrews;
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<Reply> getReplies() {
+        return replies;
+    }
+
+    public void setReplies(List<Reply> replies) {
+        this.replies = replies;
     }
 }

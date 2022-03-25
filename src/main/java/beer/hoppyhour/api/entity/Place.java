@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 
 @Entity
 @Table(name = "place")
@@ -30,6 +32,7 @@ public class Place {
     @Column(name = "coordinates")
     private String coordinates;
 
+    @JsonManagedReference
     @OneToMany(cascade =  {
         CascadeType.PERSIST,
         CascadeType.MERGE,

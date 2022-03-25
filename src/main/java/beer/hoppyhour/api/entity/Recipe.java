@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -79,12 +82,14 @@ public class Recipe {
     @Column(name = "cost")
     private Double cost;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
         CascadeType.DETACH,
         CascadeType.REFRESH
-    })
+    },
+    fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -132,6 +137,7 @@ public class Recipe {
     cascade = CascadeType.ALL)
     private List<RecipeEvent> events;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,

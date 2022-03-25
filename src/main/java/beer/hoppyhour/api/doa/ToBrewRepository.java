@@ -5,21 +5,19 @@ import java.util.List;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 
-import beer.hoppyhour.api.entity.Brewed;
+import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 
 @PreAuthorize("hasRole('ROLE_USER')")
-public interface BrewedRepository extends PagingAndSortingRepository<Brewed, Long> {
-
+public interface ToBrewRepository extends PagingAndSortingRepository<ToBrew, Long> {
     //allow users to delete their own breweds
     @Override
     void deleteById(Long id);
 
     //allow users to save or update their own breweds
     @Override
-    <S extends Brewed> S save(S entity);
+    <S extends ToBrew> S save(S entity);
 
     //find all breweds associated with user
-    List<Brewed> findByUser(User user);
-    
+    List<ToBrew> findByUser(User user);
 }
