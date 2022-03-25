@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,6 +172,7 @@ public class AuthController {
     }
 
     @GetMapping("/resendRegistrationToken")
+    @Transactional
     public ResponseEntity<?> resendRegistrationToken(HttpServletRequest request, @RequestParam("token") String existingToken) {
         try {
             //Generate a new token
@@ -179,8 +181,6 @@ public class AuthController {
             User user = authService.getUserByToken(newToken.getToken());
             //Construct email and send
             authService.resendVerificationEmail(user, newToken);
-            //If all goes well, delete the existing token
-            authService.deleteVerificationToken(existingToken);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
         }

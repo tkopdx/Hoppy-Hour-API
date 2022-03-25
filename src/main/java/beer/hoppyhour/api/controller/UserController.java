@@ -213,6 +213,22 @@ public class UserController {
     //TODO allows a user to patch their own username
 
     //TODO allows an admin or a user to delete their own account
+    @DeleteMapping("/{id}/delete")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            //delete
+            userService.deleteUserById(id);
+            //send response
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "The account has been deleted."
+                )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
 
     //TODO allows an admin to patch a user's roles
 }

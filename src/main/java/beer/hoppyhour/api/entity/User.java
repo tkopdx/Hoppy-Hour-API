@@ -19,6 +19,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
@@ -120,6 +121,16 @@ public class User {
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
     private List<Reply> replies;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user",
+                cascade = CascadeType.ALL)
+    private RefreshToken refreshToken;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user",
+                cascade = CascadeType.ALL)
+    private VerificationToken verificationToken;
 
     public void setPassword(String password) {
         this.password = password;
@@ -367,5 +378,21 @@ public class User {
 
     public void setReplies(List<Reply> replies) {
         this.replies = replies;
+    }
+
+    public RefreshToken getRefreshToken() {
+        return refreshToken;
+    }
+
+    public void setRefreshToken(RefreshToken refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
+    public VerificationToken getVerificationToken() {
+        return verificationToken;
+    }
+
+    public void setVerificationToken(VerificationToken verificationToken) {
+        this.verificationToken = verificationToken;
     }
 }

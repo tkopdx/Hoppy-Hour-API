@@ -11,10 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import beer.hoppyhour.api.doa.RefreshTokenRepository;
-import beer.hoppyhour.api.doa.UserRepository;
 import beer.hoppyhour.api.entity.RefreshToken;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.exception.TokenRefreshException;
+import beer.hoppyhour.api.service.UserService;
 
 @Service
 public class RefreshTokenService {
@@ -25,7 +25,7 @@ public class RefreshTokenService {
     private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    UserService userService;
 
     public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
@@ -37,18 +37,19 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken();
-        refreshToken.setUser(userRepository.findById(userId).get());
+        User user = userService.getUser(userId);
+        refreshToken.setUser(user);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken = refreshTokenRepository.save(refreshToken);
+        user.setRefreshToken(refreshToken);
         return refreshToken;
     }
 
     @Transactional
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
-            //TODO find out why this delete is not persisting
-            refreshTokenRepository.delete(token);
+            deleteByUserId(token.getUser().getId());
             throw new TokenRefreshException(token.getToken(), "Refresh token was expired. Please make a new signin request.");
         }
         return token;
@@ -56,7 +57,9 @@ public class RefreshTokenService {
 
     @Transactional
     public int deleteByUserId(Long userId) {
-        return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
+        User user = userService.getUser(userId);
+        user.setRefreshToken(null);
+        return refreshTokenRepository.deleteByUser(user);
     }
 
     @Transactional

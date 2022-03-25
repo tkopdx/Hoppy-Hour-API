@@ -124,16 +124,20 @@ public class AuthService implements IAuthService {
     @Override
     public VerificationToken createVerificationToken(User user, String token) {
         VerificationToken myToken = new VerificationToken(token, user);
+        user.setVerificationToken(myToken);
         return tokenRepository.save(myToken);
     }
 
     @Override
+    @Transactional
     public VerificationToken generateNewVerificationToken(String previousToken) throws RuntimeException {
         try {
             //Get the previous token
             VerificationToken previous = getVerificationToken(previousToken);
             //Get the associated user
             User user = findUserById(previous.getUser().getId());
+            //Remove the previous token
+            deleteVerificationToken(previousToken);
             //Create a new string token
             String newToken = UUID.randomUUID().toString();
             //Create a new token and save it
@@ -170,6 +174,8 @@ public class AuthService implements IAuthService {
     @Override
     @Transactional
     public int deleteVerificationToken(String token) {
+        User user = getVerificationToken(token).getUser();
+        user.setVerificationToken(null);
         return tokenRepository.deleteByToken(token);
     }
 }
