@@ -36,11 +36,11 @@ public class RefreshTokenService {
     }
 
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
+        Instant expiryDate = Instant.now().plusMillis(refreshTokenDurationMs);
+        String token = UUID.randomUUID().toString();
+        RefreshToken refreshToken = new RefreshToken(token, expiryDate);
         User user = userService.getUser(userId);
         refreshToken.setUser(user);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        refreshToken.setToken(UUID.randomUUID().toString());
         refreshToken = refreshTokenRepository.save(refreshToken);
         user.setRefreshToken(refreshToken);
         return refreshToken;

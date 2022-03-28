@@ -6,8 +6,6 @@ import beer.hoppyhour.api.payload.request.SignupRequest;
 
 public interface IAuthService {
     User persistNewUser(SignupRequest signupRequest);
-    User findUserById(Long id);
-    void saveRegisteredUser(User user);
     VerificationToken getVerificationToken(String token);
     VerificationToken createVerificationToken(User user, String token);
     int deleteVerificationToken(String token);

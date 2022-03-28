@@ -31,12 +31,14 @@ import beer.hoppyhour.api.entity.Place;
 import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.RecipeEvent;
+import beer.hoppyhour.api.entity.RefreshToken;
 import beer.hoppyhour.api.entity.Reply;
 import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.TemperatureRecipeEvent;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
+import beer.hoppyhour.api.entity.VerificationToken;
 import beer.hoppyhour.api.entity.Yeast;
 import beer.hoppyhour.api.entity.YeastDetail;
 import beer.hoppyhour.api.model.ERole;
@@ -50,7 +52,7 @@ import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
 //Uncomment and run main method to populate your database. Comment out again on subsequent main runs.
-// @Component
+@Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
@@ -86,6 +88,8 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(IngredientDetailRecipeEvent.class)
 					.addAnnotatedClass(Place.class)
 					.addAnnotatedClass(Role.class)
+					.addAnnotatedClass(RefreshToken.class)
+					.addAnnotatedClass(VerificationToken.class)
 					.buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		try {

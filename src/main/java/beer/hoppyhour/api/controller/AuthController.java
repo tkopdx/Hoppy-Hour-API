@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.RoleRepository;
-import beer.hoppyhour.api.doa.UserRepository;
 import beer.hoppyhour.api.entity.RefreshToken;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.VerificationToken;
@@ -43,6 +42,7 @@ import beer.hoppyhour.api.security.jwt.JwtUtils;
 import beer.hoppyhour.api.security.services.RefreshTokenService;
 import beer.hoppyhour.api.security.services.UserDetailsImpl;
 import beer.hoppyhour.api.service.AuthService;
+import beer.hoppyhour.api.service.UserService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -50,8 +50,6 @@ import beer.hoppyhour.api.service.AuthService;
 public class AuthController {
     @Autowired
     AuthenticationManager authenticationManager;
-    @Autowired
-    UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
     @Autowired
@@ -62,6 +60,8 @@ public class AuthController {
     AuthService authService;
     @Autowired
     RefreshTokenService refreshTokenService;
+    @Autowired
+    UserService userService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -79,7 +79,7 @@ public class AuthController {
             //Build a jwt
             ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
             //delete any previous refresh tokens
-            refreshTokenService.clearPreviousToken(userRepository.getById(userDetails.getId()));
+            refreshTokenService.clearPreviousToken(userService.getUser(userDetails.getId()));
             //create a new refresh token
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
             Set<String> roles = userDetails.getAuthorities().stream()
@@ -160,7 +160,7 @@ public class AuthController {
         }
 
         user.setEnabled(true);
-        authService.saveRegisteredUser(user);
+        userService.saveUser(user);
         return ResponseEntity.ok(new MessageResponse("Your email has been successfully verified. Cheers!"));
     }
 

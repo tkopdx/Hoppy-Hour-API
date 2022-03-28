@@ -20,10 +20,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import beer.hoppyhour.api.doa.RoleRepository;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Recipe;
+import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.payload.request.EmailPatchRequest;
@@ -57,6 +60,9 @@ public class UserController {
 
     @Autowired
     ToBrewService toBrewService;
+
+    @Autowired
+    RoleRepository roleRepository;
 
     //allows a logged in user to get their own detailed info
     @GetMapping("/{id}")
@@ -96,6 +102,27 @@ public class UserController {
             );
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+    }
+
+    //allows an admin to patch a user's roles
+    //TODO test this!
+    @PatchMapping("/{id}/roles")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> patchRoles(@PathVariable Long id, @RequestParam Set<String> strRoles) {
+        try {
+            User user = userService.getUser(id);
+            Set<Role> roles = user.getRoles();
+            Set<Role> newRoles = userService.getRolesFromStrings(strRoles);
+            roles.addAll(newRoles);
+            userService.saveUser(user);
+            return ResponseEntity.ok().body(
+                new MessageResponse("The user's roles have been updated.")
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(e.getMessage())
+            );
         }
     }
 
@@ -214,7 +241,7 @@ public class UserController {
 
     //TODO allows an admin or a user to delete their own account
     @DeleteMapping("/{id}/delete")
-    @PreAuthorize("#id == authentication.principal.id")
+    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             //delete
