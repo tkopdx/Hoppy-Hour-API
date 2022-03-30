@@ -51,6 +51,7 @@ import beer.hoppyhour.api.model.malt.PilsnerMalt;
 import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
+import io.jsonwebtoken.io.Encoders;
 //Uncomment and run main method to populate your database. Comment out again on subsequent main runs.
 // @Component
 public class DatabaseLoader implements CommandLineRunner {
@@ -129,7 +130,9 @@ public class DatabaseLoader implements CommandLineRunner {
 				//get random role
 				Set<Role> roles = new HashSet<>();
 				Role role = session.get(Role.class, roleId);
+				Role userRole = session.get(Role.class, Long.valueOf(1));
 				roles.add(role);
+				roles.add(userRole);
 
 				// create the objects
 				User user = getFakeUser(roles);
@@ -146,6 +149,17 @@ public class DatabaseLoader implements CommandLineRunner {
 			} finally {
 				session.close();
 
+			}
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+				User user = session.get(User.class, id);
+				user.setEnabled(true);
+				session.save(user);
+				session.getTransaction().commit();
+				System.out.println("Enabled user");
+			} finally {	
+				session.close();
 			}
 			session = factory.getCurrentSession();
 			try {
@@ -767,7 +781,7 @@ public class DatabaseLoader implements CommandLineRunner {
 	}
 
 	private User getFakeUser(Set<Role> roles) {
-		User user = new User(faker.name().username(), encoder.encode(faker.internet().emailAddress()), encoder.encode("password"));
+		User user = new User(faker.name().username(), Encoders.BASE64.encode(faker.internet().emailAddress().getBytes()), encoder.encode("password"));
 		user.setRoles(roles);
 		return user;
 	}

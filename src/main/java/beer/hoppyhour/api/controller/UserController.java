@@ -26,10 +26,12 @@ import beer.hoppyhour.api.doa.RoleRepository;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.Role;
+import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.payload.request.EmailPatchRequest;
 import beer.hoppyhour.api.payload.request.RolesPatchRequest;
+import beer.hoppyhour.api.payload.request.ToBrewDatePatchRequest;
 import beer.hoppyhour.api.payload.request.UserScheduleEventDeleteRequest;
 import beer.hoppyhour.api.payload.request.UserScheduleEventSaveRequest;
 import beer.hoppyhour.api.payload.response.MessageResponse;
@@ -38,6 +40,7 @@ import beer.hoppyhour.api.payload.response.UserPublicInfoResponse;
 import beer.hoppyhour.api.payload.response.UserScheduleEventResponse;
 import beer.hoppyhour.api.service.BrewedService;
 import beer.hoppyhour.api.service.RecipeService;
+import beer.hoppyhour.api.service.SchedulingService;
 import beer.hoppyhour.api.service.ToBrewService;
 import beer.hoppyhour.api.service.UserService;
 
@@ -63,6 +66,9 @@ public class UserController {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    SchedulingService schedulingService;
 
     //allows a logged in user to get their own detailed info
     @GetMapping("/{id}")
@@ -108,7 +114,7 @@ public class UserController {
     //allows an admin to patch a user's roles
     @PatchMapping("/{id}/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> patchRoles(@PathVariable Long id, @RequestBody RolesPatchRequest request) {
+    public ResponseEntity<?> patchRoles(@PathVariable Long id, @Valid @RequestBody RolesPatchRequest request) {
         if (request.getStrRoles().isEmpty()) {
             return ResponseEntity.badRequest().body(
                 new MessageResponse("Make sure to include the roles you wish to add in your request. strRoles = ['admin', 'mod'], for example.")
@@ -174,7 +180,7 @@ public class UserController {
         try {
             //get the user
             User user = userService.getUser(id);
-            //get all breweds for user and return a list of basic recipe info
+            //get all toBrews for user and return a list of basic recipe info
             List<ToBrew> toBrews = toBrewService.getEventsByUser(user);
             //send response
             return ResponseEntity.ok().body(
@@ -190,11 +196,11 @@ public class UserController {
     //allows a user to add a toBrew
     @PostMapping("/{id}/tobrews")
     @PreAuthorize("#id == authentication.principal.id")
-    public ResponseEntity<?> saveNewToBrew(@PathVariable Long id, @RequestBody UserScheduleEventSaveRequest request) {
+    public ResponseEntity<?> saveNewToBrew(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {        
         try {
             //convert request string to Date object
             Date date = new Date(request.getWhenToBrewInMs());
-            //make a new brewed object
+            //make a new toBrew object
             ToBrew toBrew = new ToBrew(date);
             //add to user
             User user = userService.getUser(id);
@@ -214,10 +220,36 @@ public class UserController {
         }
     }
 
+    //allows a user to patch their toBrew date
+    @PatchMapping("/{id}/tobrews")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> patchToBrewDate(@PathVariable Long id, @Valid @RequestBody ToBrewDatePatchRequest request) {
+        try {
+            //make sure the client owns the requested item
+            if (id == toBrewService.getById(request.getId()).getUser().getId()) {
+                //update
+                toBrewService.update(request.getId(), request.getWhenToBrewInMs());
+                //send response
+                return ResponseEntity.ok().body(
+                    new MessageResponse(
+                        "Updated toBrew date successfully."
+                    )
+                );
+            } else {
+                return ResponseEntity.badRequest().body(
+                    new MessageResponse("User with id " + id + " cannot update this item.")
+                );
+            }
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
+
     //allows a user to delete a toBrew
     @DeleteMapping("/{id}/tobrews")
     @PreAuthorize("#id == authentication.principal.id")
-    public ResponseEntity<?> deleteToBrew(@PathVariable Long id, @RequestBody UserScheduleEventDeleteRequest request) {
+    public ResponseEntity<?> deleteToBrew(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
         try {
             //make sure the client owns the requested item
             if (id == toBrewService.getById(request.getId()).getUser().getId()) {
@@ -240,12 +272,85 @@ public class UserController {
         }
     }
 
-    //TODO allows a user to get their own schedulings
+    //allows a user to get their own schedulings
+    @GetMapping("/{id}/schedulings")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> getSchedulings(@PathVariable Long id) {
+        try {
+            //get the user
+            User user = userService.getUser(id);
+            //get all schedulings for user and return a list of basic recipe info
+            List<Scheduling> schedulings = schedulingService.getEventsByUser(user);
+            //send response
+            return ResponseEntity.ok().body(
+                new UserScheduleEventResponse<Scheduling>(
+                    schedulings
+                )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
+
+    //allows a user to add a new scheduling
+    @PostMapping("/{id}/schedulings")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> saveNewScheduling(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {
+        try {
+            //make a new scheduling object
+            Scheduling scheduling = new Scheduling();
+            //add to user
+            User user = userService.getUser(id);
+            user.addScheduling(scheduling);
+            //add to recipe
+            Recipe recipe = recipeService.getRecipeById(request.getRecipeId());
+            recipe.addScheduling(scheduling);
+            //save in scheduling repo
+            schedulingService.save(scheduling);
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "Saved scheduling successfully."
+                )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
+
+    //allows a user to delete their scheduling
+    @DeleteMapping("/{id}/schedulings")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> deleteScheduling(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
+        try {
+            //make sure the client owns the requested item
+            if (id == schedulingService.getById(request.getId()).getUser().getId()) {
+                //delete
+                schedulingService.deleteById(request.getId());
+                //send response
+                return ResponseEntity.ok().body(
+                    new MessageResponse(
+                        "Deleted to scheduling successfully."
+                    )
+                );
+            } else {
+                return ResponseEntity.badRequest().body(
+                    new MessageResponse("User with id " + id + " cannot delete this item.")
+                );
+            }
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
+
     //TODO allows a user to get their own brewings
+    //TODO allows a user to add a brewing
+    //TODO allows a user to delete a brewing
     
     //TODO allows a user to patch their own username
+    //TODO allows a user to patch their own password
 
-    //TODO allows an admin or a user to delete their own account
+    //allows an admin or a user to delete their own account
     @DeleteMapping("/{id}/delete")
     @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
@@ -262,6 +367,4 @@ public class UserController {
             return ResponseEntity.badRequest().body("Error! " + e.getMessage());
         }
     }
-
-    //TODO allows an admin to patch a user's roles
 }

@@ -1,5 +1,6 @@
 package beer.hoppyhour.api.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,6 +42,13 @@ public class ToBrewService implements IUserScheduleEventService<ToBrew> {
     @Override
     public void deleteById(Long id) {
         toBrewRepository.deleteById(id);
+    }
+
+    public ToBrew update(Long id, long when) {
+        ToBrew toBrew = getById(id);
+        Date date = new Date(when);
+        toBrew.setWhenToBrew(date);
+        return save(toBrew);
     }
     
 }

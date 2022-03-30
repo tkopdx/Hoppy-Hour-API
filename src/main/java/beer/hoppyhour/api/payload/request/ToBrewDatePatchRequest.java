@@ -2,24 +2,22 @@ package beer.hoppyhour.api.payload.request;
 
 import javax.validation.constraints.NotBlank;
 
-public class UserScheduleEventSaveRequest {
+public class ToBrewDatePatchRequest {
     @NotBlank
-    private Long recipeId;
     private long whenToBrewInMs;
-
-    public Long getRecipeId() {
-        return recipeId;
-    }
-
-    public void setRecipeId(Long recipeId) {
-        this.recipeId = recipeId;
-    }
+    @NotBlank
+    private Long id;
 
     public long getWhenToBrewInMs() {
         return whenToBrewInMs;
     }
-
     public void setWhenToBrewInMs(long whenToBrewInMs) {
         this.whenToBrewInMs = whenToBrewInMs;
+    }
+    public Long getId() {
+        return id;
+    }
+    public void setId(Long id) {
+        this.id = id;
     }
 }
