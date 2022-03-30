@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.RoleRepository;
@@ -30,6 +29,7 @@ import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.payload.request.EmailPatchRequest;
+import beer.hoppyhour.api.payload.request.RolesPatchRequest;
 import beer.hoppyhour.api.payload.request.UserScheduleEventDeleteRequest;
 import beer.hoppyhour.api.payload.request.UserScheduleEventSaveRequest;
 import beer.hoppyhour.api.payload.response.MessageResponse;
@@ -106,15 +106,21 @@ public class UserController {
     }
 
     //allows an admin to patch a user's roles
-    //TODO test this!
     @PatchMapping("/{id}/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> patchRoles(@PathVariable Long id, @RequestParam Set<String> strRoles) {
+    public ResponseEntity<?> patchRoles(@PathVariable Long id, @RequestBody RolesPatchRequest request) {
+        if (request.getStrRoles().isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                new MessageResponse("Make sure to include the roles you wish to add in your request. strRoles = ['admin', 'mod'], for example.")
+            );
+        }
+        
         try {
             User user = userService.getUser(id);
             Set<Role> roles = user.getRoles();
-            Set<Role> newRoles = userService.getRolesFromStrings(strRoles);
+            Set<Role> newRoles = userService.getRolesFromStrings(request.getStrRoles());
             roles.addAll(newRoles);
+            user.setRoles(roles);
             userService.saveUser(user);
             return ResponseEntity.ok().body(
                 new MessageResponse("The user's roles have been updated.")
