@@ -370,7 +370,7 @@ public class UserController {
         }
     }
 
-    //TODO allows a user to get their own brewings
+    //allows a user to get their own brewings
     @GetMapping("/{id}/brewings")
     @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> getBrewings(@PathVariable Long id) {
@@ -389,7 +389,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Error! " + e.getMessage());
         }
     }
-    //TODO allows a user to add a brewing
+    //allows a user to add a brewing
     @PostMapping("/{id}/brewings")
     @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> saveNewBrewing(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {
@@ -413,7 +413,7 @@ public class UserController {
             return ResponseEntity.badRequest().body("Error! " + e.getMessage());
         }
     }
-    //TODO allows a user to delete a brewing
+    //allows a user to delete a brewing
     @DeleteMapping("/{id}/brewings")
     @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> deleteBrewing(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
