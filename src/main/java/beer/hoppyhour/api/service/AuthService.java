@@ -49,7 +49,7 @@ public class AuthService implements IAuthService {
         if (userService.existsByUsername(signupRequest.getUsername())) {
             throw new UserAlreadyExistsException("There is an account with the username: " + signupRequest.getUsername());
         }
-        if (userService.existsByEmail(signupRequest.getEmail())) {
+        if (userService.existsByEmail(Encoders.BASE64.encode(signupRequest.getEmail().getBytes()))) {
             throw new UserAlreadyExistsException("There is an account with the email: " + signupRequest.getEmail());
         }
 

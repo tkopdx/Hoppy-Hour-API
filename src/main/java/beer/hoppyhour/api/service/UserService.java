@@ -1,5 +1,6 @@
 package beer.hoppyhour.api.service;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import beer.hoppyhour.api.doa.RoleRepository;
 import beer.hoppyhour.api.doa.UserRepository;
+import beer.hoppyhour.api.email.component.EmailService;
 import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.exception.RoleNotFoundException;
@@ -23,6 +25,9 @@ public class UserService implements IUserService {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    EmailService emailService;
 
     @Override
     public User getUser(Long id) throws UserNotFoundException {
@@ -101,6 +106,14 @@ public class UserService implements IUserService {
         } else {
             throw new UserNotFoundException("with email, " + email);
         }
+    }
+
+    @Override
+    public void sendEmailChangedEmail(User user) {
+        String to = new String(Base64.getDecoder().decode(user.getEmail())); 
+        String subject = "A Hoppy Hour user has set email address this as their email.";
+        String text = "It looks like a Hoppy Hour user has set this email address as their email. If that was you, then great! If not, please feel free to disregard this email or to contact us at SOME EMAIL.";
+        emailService.sendSimpleEmail(to, subject, text);
     }
     
 }

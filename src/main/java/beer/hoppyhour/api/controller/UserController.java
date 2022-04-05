@@ -29,11 +29,13 @@ import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.Scheduling;
 import beer.hoppyhour.api.entity.ToBrew;
 import beer.hoppyhour.api.entity.User;
+import beer.hoppyhour.api.error.UserAlreadyExistsException;
 import beer.hoppyhour.api.payload.request.EmailPatchRequest;
 import beer.hoppyhour.api.payload.request.RolesPatchRequest;
 import beer.hoppyhour.api.payload.request.ToBrewDatePatchRequest;
 import beer.hoppyhour.api.payload.request.UserScheduleEventDeleteRequest;
 import beer.hoppyhour.api.payload.request.UserScheduleEventSaveRequest;
+import beer.hoppyhour.api.payload.request.UsernamePatchRequest;
 import beer.hoppyhour.api.payload.response.MessageResponse;
 import beer.hoppyhour.api.payload.response.UserInfoResponse;
 import beer.hoppyhour.api.payload.response.UserPublicInfoResponse;
@@ -43,6 +45,7 @@ import beer.hoppyhour.api.service.RecipeService;
 import beer.hoppyhour.api.service.SchedulingService;
 import beer.hoppyhour.api.service.ToBrewService;
 import beer.hoppyhour.api.service.UserService;
+import io.jsonwebtoken.io.Encoders;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -97,9 +100,19 @@ public class UserController {
     @PreAuthorize("#id == authentication.principal.id") 
     public ResponseEntity<?> patchEmail(@PathVariable Long id, @Valid @RequestBody EmailPatchRequest emailPatchRequest) {
         try {
+            //make sure no other user has the email
+            if (userService.existsByEmail(Encoders.BASE64.encode(emailPatchRequest.getEmail().getBytes()))) {
+                throw new UserAlreadyExistsException("There is an account with the email: " + emailPatchRequest.getEmail());
+            }
+            //get the user
             User user = userService.getUser(id);
-            user.setEmail(encoder.encode(emailPatchRequest.getEmail()));
+            //encode and save email
+            user.setEmail(Encoders.BASE64.encode(emailPatchRequest.getEmail().getBytes()));
+            //save the user
             userService.saveUser(user);
+            //send an email to the new email address to confirm
+            userService.sendEmailChangedEmail(user);
+            //return good response
             return ResponseEntity.ok().body(
                 new MessageResponse(
                     //first send a verification email before updating their email in the database
@@ -347,7 +360,40 @@ public class UserController {
     //TODO allows a user to add a brewing
     //TODO allows a user to delete a brewing
     
-    //TODO allows a user to patch their own username
+    //allows a user to patch their own username
+    @PatchMapping("/{id}/username")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> patchUsername(@PathVariable Long id, @Valid @RequestBody UsernamePatchRequest request) throws UserAlreadyExistsException {
+        try {
+            //check for an existing account with username
+            if (userService.existsByUsername(request.getUsername())) {
+                throw new UserAlreadyExistsException("There is an account with the username: " + request.getUsername());
+            }
+
+            //get user
+            User user = userService.getUser(id);
+            //set username
+            user.setUsername(request.getUsername());
+            //save user
+            userService.saveUser(user);
+            //return good response
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "Successfully updated username. Please sign out and sign in again."
+                )
+            );
+
+            //TODO on the client end
+            //Because JWT and authorization is built upon the username, force clients to signout and signin again after a username change to rebuild the auth instance and jwt
+        } catch (Exception e) {
+            //return bad response
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error! " + e.getMessage()
+                )
+            );
+        }
+    }
 
     //allows an admin or a user to delete their own account
     @DeleteMapping("/{id}/delete")

@@ -14,4 +14,5 @@ public interface IUserService {
     Set<Role> getRolesFromStrings(Set<String> strRoles);
     Boolean existsByUsername(String username);
     Boolean existsByEmail(String email);
+    void sendEmailChangedEmail(User user);
 }
