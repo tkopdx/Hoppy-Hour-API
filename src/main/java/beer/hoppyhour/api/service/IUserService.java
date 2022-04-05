@@ -8,6 +8,7 @@ import beer.hoppyhour.api.exception.UserNotFoundException;
 
 public interface IUserService {
     User getUser(Long id) throws UserNotFoundException;
+    User getUserByEmail(String email) throws UserNotFoundException;
     User saveUser(User user);
     void deleteUserById(Long id);
     Set<Role> getRolesFromStrings(Set<String> strRoles);

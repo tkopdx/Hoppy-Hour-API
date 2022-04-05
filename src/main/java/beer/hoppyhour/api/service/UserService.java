@@ -91,5 +91,16 @@ public class UserService implements IUserService {
     public Boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
+    @Override
+    public User getUserByEmail(String email) throws UserNotFoundException {
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            throw new UserNotFoundException("with email, " + email);
+        }
+    }
     
 }

@@ -124,13 +124,21 @@ public class User {
 
     @JsonIgnore
     @OneToOne(mappedBy = "user",
-                cascade = CascadeType.ALL)
+                cascade = CascadeType.ALL,
+                orphanRemoval = true)
     private RefreshToken refreshToken;
 
     @JsonIgnore
     @OneToOne(mappedBy = "user",
-                cascade = CascadeType.ALL)
+                cascade = CascadeType.ALL,
+                orphanRemoval = true)
     private VerificationToken verificationToken;
+
+    @JsonIgnore
+    @OneToOne(mappedBy = "user",
+                cascade = CascadeType.ALL,
+                orphanRemoval = true)
+    private PasswordResetToken passwordResetToken;
 
     public void setPassword(String password) {
         this.password = password;
@@ -394,5 +402,13 @@ public class User {
 
     public void setVerificationToken(VerificationToken verificationToken) {
         this.verificationToken = verificationToken;
+    }
+
+    public PasswordResetToken getPasswordResetToken() {
+        return passwordResetToken;
+    }
+
+    public void setPasswordResetToken(PasswordResetToken passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
     }
 }

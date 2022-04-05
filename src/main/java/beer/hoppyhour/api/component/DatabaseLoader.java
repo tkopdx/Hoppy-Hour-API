@@ -27,6 +27,7 @@ import beer.hoppyhour.api.entity.Malt;
 import beer.hoppyhour.api.entity.MaltDetail;
 import beer.hoppyhour.api.entity.OtherIngredient;
 import beer.hoppyhour.api.entity.OtherIngredientDetail;
+import beer.hoppyhour.api.entity.PasswordResetToken;
 import beer.hoppyhour.api.entity.Place;
 import beer.hoppyhour.api.entity.Rating;
 import beer.hoppyhour.api.entity.Recipe;
@@ -91,6 +92,7 @@ public class DatabaseLoader implements CommandLineRunner {
 					.addAnnotatedClass(Role.class)
 					.addAnnotatedClass(RefreshToken.class)
 					.addAnnotatedClass(VerificationToken.class)
+					.addAnnotatedClass(PasswordResetToken.class)
 					.buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		try {

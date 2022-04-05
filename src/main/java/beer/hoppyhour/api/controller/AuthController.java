@@ -1,11 +1,9 @@
 package beer.hoppyhour.api.controller;
 
-import java.util.Calendar;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,11 +27,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.RoleRepository;
+import beer.hoppyhour.api.entity.PasswordResetToken;
 import beer.hoppyhour.api.entity.RefreshToken;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.VerificationToken;
-import beer.hoppyhour.api.exception.TokenRefreshException;
+import beer.hoppyhour.api.exception.TokenExpiredException;
 import beer.hoppyhour.api.payload.request.LoginRequest;
+import beer.hoppyhour.api.payload.request.PasswordResetConfirm;
+import beer.hoppyhour.api.payload.request.PasswordResetRequest;
 import beer.hoppyhour.api.payload.request.SignupRequest;
 import beer.hoppyhour.api.payload.request.TokenRefreshRequest;
 import beer.hoppyhour.api.payload.response.JwtResponse;
@@ -39,10 +42,13 @@ import beer.hoppyhour.api.payload.response.MessageResponse;
 import beer.hoppyhour.api.payload.response.TokenRefreshResponse;
 import beer.hoppyhour.api.registration.OnRegistrationCompleteEvent;
 import beer.hoppyhour.api.security.jwt.JwtUtils;
+import beer.hoppyhour.api.security.services.PasswordResetTokenService;
 import beer.hoppyhour.api.security.services.RefreshTokenService;
 import beer.hoppyhour.api.security.services.UserDetailsImpl;
+import beer.hoppyhour.api.security.services.VerificationTokenService;
 import beer.hoppyhour.api.service.AuthService;
 import beer.hoppyhour.api.service.UserService;
+import io.jsonwebtoken.io.Encoders;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -62,6 +68,12 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
     @Autowired
     UserService userService;
+    @Autowired
+    VerificationTokenService verificationTokenService;
+    @Autowired
+    PasswordResetTokenService passwordResetTokenService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -81,7 +93,7 @@ public class AuthController {
             //delete any previous refresh tokens
             refreshTokenService.clearPreviousToken(userService.getUser(userDetails.getId()));
             //create a new refresh token
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+            RefreshToken refreshToken = refreshTokenService.createToken(userDetails.getId());
             Set<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toSet());
@@ -104,8 +116,10 @@ public class AuthController {
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         try {
             String refreshToken = request.getRefreshToken();
-            RefreshToken token = refreshTokenService.findByToken(refreshToken)
-                                .orElseThrow(() -> new TokenRefreshException(refreshToken, "Refresh token is not in the database!"));
+            RefreshToken token = refreshTokenService.findByToken(refreshToken);
+            if (token == null) {
+                throw new TokenExpiredException(refreshToken, "Refresh token is not in the database!");
+            }
             token = refreshTokenService.verifyExpiration(token);
             User user = token.getUser();
             String jwtString = jwtUtils.generateTokenFromUsername(user.getUsername());
@@ -144,24 +158,31 @@ public class AuthController {
     }
 
     @GetMapping("/registrationConfirm")
+    @Transactional
     public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token) {
-        // Locale locale = request.getLocale();
+        try {
+            VerificationToken verificationToken = verificationTokenService.findByToken(token);
+            if (verificationToken == null) {
+                // return bad request
+                return ResponseEntity.badRequest().body(new MessageResponse("Your token is invalid."));
+            }
 
-        VerificationToken verificationToken = authService.getVerificationToken(token);
-        if (verificationToken == null) {
-            // throw error
-            return ResponseEntity.badRequest().body(new MessageResponse("Your token is invalid."));
+            User user = verificationToken.getUser();
+            verificationToken = verificationTokenService.verifyExpiration(verificationToken);
+
+            //enable the user and save
+            user.setEnabled(true);
+            userService.saveUser(user);
+            //delete verification token
+            verificationTokenService.deleteByUserId(user.getId());
+            return ResponseEntity.ok(new MessageResponse("Your email has been successfully verified. Cheers!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error! " + e.getMessage()
+                )
+            );
         }
-
-        User user = verificationToken.getUser();
-        Calendar calendar = Calendar.getInstance();
-        if ((verificationToken.getExpiryDate().getTime() - calendar.getTime().getTime()) <= 0) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Your token is expired. Click the Resend Verification link in the expired email to get another verification email."));
-        }
-
-        user.setEnabled(true);
-        userService.saveUser(user);
-        return ResponseEntity.ok(new MessageResponse("Your email has been successfully verified. Cheers!"));
     }
 
     @PostMapping("/signout")
@@ -186,5 +207,70 @@ public class AuthController {
         }
         
         return ResponseEntity.ok().body(new MessageResponse("A new verification email has been sent! Please verify within 24 hours."));
+    }
+
+    //allows a user to patch their own password
+    @PostMapping("/requestPasswordReset")
+    @Transactional
+    public ResponseEntity<?> requestPasswordReset(@Valid @RequestBody PasswordResetRequest request) {
+        try {
+            //get user via email
+            User user = userService.getUserByEmail(Encoders.BASE64.encode(request.getEmail().getBytes()));
+            //delete any previous tokens
+            passwordResetTokenService.clearPreviousToken(user);
+            //create a password reset token and save it
+            PasswordResetToken passwordResetToken = passwordResetTokenService.createToken(user.getId());
+
+            //send email with custom token
+            authService.sendPasswordResetTokenEmail(passwordResetToken, user);
+
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "A password reset token has been sent to your email. Please use that token to reset your password."
+                )
+            );
+        } catch (Exception e) {
+            //return bad request
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error!" + e.getMessage()
+                )
+            );
+        }
+    }
+
+    @PostMapping("/confirmPasswordReset")
+    @Transactional
+    public ResponseEntity<?> confirmPasswordReset(@Valid @RequestBody PasswordResetConfirm request) {
+        try {
+            
+            //get the token
+            PasswordResetToken passwordResetToken = passwordResetTokenService.findByToken(request.getToken());
+
+            //verify token exists and expiration
+            passwordResetToken = passwordResetTokenService.verifyExpiration(passwordResetToken);
+            
+            //if verified, get user
+            User user = passwordResetToken.getUser();
+            //encrypt new password
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            userService.saveUser(user);
+            //delete token
+            passwordResetTokenService.deleteByUserId(user.getId());
+            //send good response
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "Your password has been successfully updated."
+                )
+            );
+        } catch (Exception e) {
+            //send bad response
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error! " + e.getMessage()
+                )
+            );
+        }
+
     }
 }

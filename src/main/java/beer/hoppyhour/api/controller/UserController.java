@@ -348,7 +348,6 @@ public class UserController {
     //TODO allows a user to delete a brewing
     
     //TODO allows a user to patch their own username
-    //TODO allows a user to patch their own password
 
     //allows an admin or a user to delete their own account
     @DeleteMapping("/{id}/delete")

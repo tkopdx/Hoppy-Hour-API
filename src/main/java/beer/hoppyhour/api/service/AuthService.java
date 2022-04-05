@@ -2,7 +2,6 @@ package beer.hoppyhour.api.service;
 
 import java.util.Base64;
 import java.util.Set;
-import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -11,14 +10,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import beer.hoppyhour.api.doa.PasswordResetTokenRepository;
 import beer.hoppyhour.api.doa.RoleRepository;
-import beer.hoppyhour.api.doa.VerificationTokenRepository;
 import beer.hoppyhour.api.email.component.EmailServiceImpl;
+import beer.hoppyhour.api.entity.PasswordResetToken;
 import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.entity.VerificationToken;
 import beer.hoppyhour.api.error.UserAlreadyExistsException;
 import beer.hoppyhour.api.payload.request.SignupRequest;
+import beer.hoppyhour.api.security.services.VerificationTokenService;
 import io.jsonwebtoken.io.Encoders;
 
 @Service
@@ -33,10 +34,13 @@ public class AuthService implements IAuthService {
     RoleRepository roleRepository;
 
     @Autowired
-    VerificationTokenRepository tokenRepository;
+    VerificationTokenService verificationTokenService;
 
     @Autowired
     EmailServiceImpl emailService;
+
+    @Autowired
+    PasswordResetTokenRepository passwordResetTokenRepository;
     
     @Override
     public User persistNewUser(@Valid SignupRequest signupRequest) throws UserAlreadyExistsException {
@@ -62,31 +66,17 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    public VerificationToken getVerificationToken(String token) {
-        return tokenRepository.findByToken(token);
-    }
-
-    @Override
-    public VerificationToken createVerificationToken(User user, String token) {
-        VerificationToken myToken = new VerificationToken(token, user);
-        user.setVerificationToken(myToken);
-        return tokenRepository.save(myToken);
-    }
-
-    @Override
     @Transactional
     public VerificationToken generateNewVerificationToken(String previousToken) throws RuntimeException {
         try {
             //Get the previous token
-            VerificationToken previous = getVerificationToken(previousToken);
+            VerificationToken previous = verificationTokenService.findByToken(previousToken);
             //Get the associated user
             User user = userService.getUser(previous.getUser().getId());
             //Remove the previous token
-            deleteVerificationToken(previousToken);
-            //Create a new string token
-            String newToken = UUID.randomUUID().toString();
+            verificationTokenService.clearPreviousToken(user);
             //Create a new token and save it
-            return createVerificationToken(user, newToken);
+            return verificationTokenService.createToken(user.getId());
         } catch (RuntimeException e) {
             throw e;
         }
@@ -94,7 +84,7 @@ public class AuthService implements IAuthService {
 
     @Override
     public User getUserByToken(String token) {
-        return getVerificationToken(token).getUser();
+        return verificationTokenService.findByToken(token).getUser();
     }
 
     @Override
@@ -117,10 +107,18 @@ public class AuthService implements IAuthService {
     }
 
     @Override
-    @Transactional
-    public int deleteVerificationToken(String token) {
-        User user = getVerificationToken(token).getUser();
-        user.setVerificationToken(null);
-        return tokenRepository.deleteByToken(token);
+    public void sendPasswordResetTokenEmail(PasswordResetToken token, User user) {
+        byte[] decodedBytes = Base64.getDecoder().decode(user.getEmail());
+        String to = new String(decodedBytes);
+        String subject = "Password Reset Token from Hoppy Hour";
+        //Hard coding the URL for now
+        String strToken = token.getToken();
+        String message = "Hey! Someone requested a password reset token from us. Use the following code in the Hoppy Hour app to reset your password.\r\n";
+        //TODO alter base path for production
+        String text = message + "\r\n" + "Your code: " + strToken;
+        //send email
+        emailService.sendSimpleEmail(to, subject, text);
     }
+
+    
 }

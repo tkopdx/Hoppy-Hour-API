@@ -6,12 +6,12 @@ import javax.persistence.Table;
 import beer.hoppyhour.api.model.AuthToken;
 
 @Entity
-@Table(name = "verification_token")
-public class VerificationToken extends AuthToken {
+@Table(name = "password_reset_token")
+public class PasswordResetToken extends AuthToken {
 
-    public VerificationToken() {}
+    public PasswordResetToken() {}
 
-    public VerificationToken(String token, User user) {
+    public PasswordResetToken(String token, User user) {
         super(token, user);
     }
 
