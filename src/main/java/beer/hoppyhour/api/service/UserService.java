@@ -104,7 +104,7 @@ public class UserService implements IUserService {
         if (user.isPresent()) {
             return user.get();
         } else {
-            throw new UserNotFoundException("with email, " + email);
+            throw new UserNotFoundException("with email, " + Base64.getDecoder().decode(email));
         }
     }
 

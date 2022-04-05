@@ -59,7 +59,7 @@ public class AuthService implements IAuthService {
                     Encoders.BASE64.encode(signupRequest.getEmail().getBytes()),
                     //Encode passwords with Bcrypt. There is no way to decode these! 
                     passwordEncoder.encode(signupRequest.getPassword()));
-        Set<String> strRoles = signupRequest.getRoles();
+        Set<String> strRoles = null;
         Set<Role> roles = userService.getRolesFromStrings(strRoles);
         user.setRoles(roles);
         return userService.saveUser(user);

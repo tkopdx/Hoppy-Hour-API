@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.RoleRepository;
 import beer.hoppyhour.api.entity.Brewed;
+import beer.hoppyhour.api.entity.Brewing;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.Role;
 import beer.hoppyhour.api.entity.Scheduling;
@@ -41,6 +43,7 @@ import beer.hoppyhour.api.payload.response.UserInfoResponse;
 import beer.hoppyhour.api.payload.response.UserPublicInfoResponse;
 import beer.hoppyhour.api.payload.response.UserScheduleEventResponse;
 import beer.hoppyhour.api.service.BrewedService;
+import beer.hoppyhour.api.service.BrewingService;
 import beer.hoppyhour.api.service.RecipeService;
 import beer.hoppyhour.api.service.SchedulingService;
 import beer.hoppyhour.api.service.ToBrewService;
@@ -73,6 +76,9 @@ public class UserController {
     @Autowired
     SchedulingService schedulingService;
 
+    @Autowired
+    BrewingService brewingService;
+
     //allows a logged in user to get their own detailed info
     @GetMapping("/{id}")
     @PreAuthorize("#id == authentication.principal.id")
@@ -100,12 +106,20 @@ public class UserController {
     @PreAuthorize("#id == authentication.principal.id") 
     public ResponseEntity<?> patchEmail(@PathVariable Long id, @Valid @RequestBody EmailPatchRequest emailPatchRequest) {
         try {
+            //get the user
+            User user = userService.getUser(id);
+            //verify password
+            if (!encoder.matches(emailPatchRequest.getPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new MessageResponse(
+                        "The password was incorrect."
+                    )
+                );
+            }
             //make sure no other user has the email
             if (userService.existsByEmail(Encoders.BASE64.encode(emailPatchRequest.getEmail().getBytes()))) {
                 throw new UserAlreadyExistsException("There is an account with the email: " + emailPatchRequest.getEmail());
             }
-            //get the user
-            User user = userService.getUser(id);
             //encode and save email
             user.setEmail(Encoders.BASE64.encode(emailPatchRequest.getEmail().getBytes()));
             //save the user
@@ -357,21 +371,93 @@ public class UserController {
     }
 
     //TODO allows a user to get their own brewings
+    @GetMapping("/{id}/brewings")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> getBrewings(@PathVariable Long id) {
+        try {
+            //get the user
+            User user = userService.getUser(id);
+            //get all brewings for user and return a list of basic recipe info
+            List<Brewing> brewings = brewingService.getEventsByUser(user);
+            //send response
+            return ResponseEntity.ok().body(
+                new UserScheduleEventResponse<Brewing>(
+                    brewings
+                )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
     //TODO allows a user to add a brewing
+    @PostMapping("/{id}/brewings")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> saveNewBrewing(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {
+        try {
+            //make a new brewing object
+            Brewing brewing = new Brewing();
+            //add to user
+            User user = userService.getUser(id);
+            user.addBrewing(brewing);
+            //add to recipe
+            Recipe recipe = recipeService.getRecipeById(request.getRecipeId());
+            recipe.addBrewing(brewing);
+            //save in brewing repo
+            brewingService.save(brewing);
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "Saved brewing successfully."
+                )
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
     //TODO allows a user to delete a brewing
+    @DeleteMapping("/{id}/brewings")
+    @PreAuthorize("#id == authentication.principal.id")
+    public ResponseEntity<?> deleteBrewing(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
+        try {
+            //make sure the client owns the requested item
+            if (id == brewingService.getById(request.getId()).getUser().getId()) {
+                //delete
+                brewingService.deleteById(request.getId());
+                //send response
+                return ResponseEntity.ok().body(
+                    new MessageResponse(
+                        "Deleted to brewing successfully."
+                    )
+                );
+            } else {
+                return ResponseEntity.badRequest().body(
+                    new MessageResponse("User with id " + id + " cannot delete this item.")
+                );
+            }
+            
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error! " + e.getMessage());
+        }
+    }
     
     //allows a user to patch their own username
     @PatchMapping("/{id}/username")
     @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> patchUsername(@PathVariable Long id, @Valid @RequestBody UsernamePatchRequest request) throws UserAlreadyExistsException {
         try {
+            //get user
+            User user = userService.getUser(id);
+            //verify the password
+            if (!encoder.matches(request.getPassword(), user.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                    new MessageResponse(
+                        "The password was incorrect."
+                    )
+                );
+            }
             //check for an existing account with username
             if (userService.existsByUsername(request.getUsername())) {
                 throw new UserAlreadyExistsException("There is an account with the username: " + request.getUsername());
             }
-
-            //get user
-            User user = userService.getUser(id);
             //set username
             user.setUsername(request.getUsername());
             //save user

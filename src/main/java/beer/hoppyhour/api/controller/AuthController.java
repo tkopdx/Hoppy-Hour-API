@@ -103,7 +103,6 @@ public class AuthController {
                                 refreshToken.getToken(), 
                                 userDetails.getId(), 
                                 userDetails.getUsername(), 
-                                userDetails.getEmail(), 
                                 roles)
                     );
         } catch (UsernameNotFoundException e) {

@@ -1,9 +1,6 @@
 package beer.hoppyhour.api.payload.request;
 
-import javax.validation.constraints.NotBlank;
-
 public class UserScheduleEventDeleteRequest {
-    @NotBlank
     private Long id;
 
     public Long getId() {
