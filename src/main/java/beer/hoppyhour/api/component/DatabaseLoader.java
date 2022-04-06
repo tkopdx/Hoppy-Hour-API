@@ -53,8 +53,8 @@ import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
 import io.jsonwebtoken.io.Encoders;
-//Uncomment and run main method to populate your database. Comment out again on subsequent main runs.
-// @Component
+
+@Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
@@ -97,7 +97,11 @@ public class DatabaseLoader implements CommandLineRunner {
 		Session session = factory.getCurrentSession();
 		try {
 			session.beginTransaction();
-
+			Role possibleUserRole = session.get(Role.class, Long.valueOf(1));
+			if (possibleUserRole != null) {
+				System.out.println("The database is likely seeded with fake data. Skipping seeding.");
+				return;
+			}
 			Role role = session.get(Role.class, Long.valueOf(1));
 			if (role == null) {
 				Role userRole = new Role(ERole.ROLE_USER);
