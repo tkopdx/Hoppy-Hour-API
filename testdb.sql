@@ -15,13 +15,15 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+use heroku_170fa495f0ce072;
+
 --
 -- Table structure for table `brewed`
 --
 
 DROP TABLE IF EXISTS `brewed`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `brewed` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_date` datetime(6) DEFAULT NULL,
@@ -32,7 +34,7 @@ CREATE TABLE `brewed` (
   KEY `FKmu8q1mr4wtj5lgb872ftyyiah` (`user_id`),
   CONSTRAINT `FK1h2d47mrfgehy58g7xmt4sei1` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`),
   CONSTRAINT `FKmu8q1mr4wtj5lgb872ftyyiah` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -51,7 +53,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `brewing`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `brewing` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_date` datetime(6) DEFAULT NULL,
@@ -62,7 +64,7 @@ CREATE TABLE `brewing` (
   KEY `FK12dt4my2xpemrlelsogoqks8t` (`user_id`),
   CONSTRAINT `FK12dt4my2xpemrlelsogoqks8t` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `FKoq2c96v3s4ugfrel6l0nd3k7v` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +83,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `comment`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `comment` (
   `type` varchar(31) NOT NULL,
   `id` bigint NOT NULL,
@@ -99,7 +101,7 @@ CREATE TABLE `comment` (
   CONSTRAINT `FK8kcum44fvpupyw6f5baccx25c` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `FKe5i1rxybcm40jcn98fj1jmvit` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`),
   CONSTRAINT `FKlwswl1itgoh82b41xqkw7llai` FOREIGN KEY (`reply_to`) REFERENCES `comment` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -118,10 +120,10 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `hibernate_sequence`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `hibernate_sequence` (
   `next_val` bigint DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -140,12 +142,12 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `hibernate_sequences`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `hibernate_sequences` (
   `sequence_name` varchar(255) NOT NULL,
   `next_val` bigint DEFAULT NULL,
   PRIMARY KEY (`sequence_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -164,7 +166,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `hop`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `hop` (
   `id` bigint NOT NULL,
   `brand` varchar(255) DEFAULT NULL,
@@ -178,7 +180,7 @@ CREATE TABLE `hop` (
   PRIMARY KEY (`id`),
   KEY `FKirej6mt5ddmjt06wsq54vtkn9` (`place_id`),
   CONSTRAINT `FKirej6mt5ddmjt06wsq54vtkn9` FOREIGN KEY (`place_id`) REFERENCES `place` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -197,7 +199,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `ingredient_detail`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `ingredient_detail` (
   `detail_type` varchar(31) NOT NULL,
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -213,7 +215,7 @@ CREATE TABLE `ingredient_detail` (
   KEY `FKoyp62r4gcr54xris5daiay8ya` (`recipe_id`),
   CONSTRAINT `FKm7e5ljlcr4fe26cqr7tm50u6s` FOREIGN KEY (`recipe_event_id`) REFERENCES `recipe_event` (`id`),
   CONSTRAINT `FKoyp62r4gcr54xris5daiay8ya` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=133 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -232,7 +234,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `malt`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `malt` (
   `id` bigint NOT NULL,
   `brand` varchar(255) DEFAULT NULL,
@@ -245,7 +247,7 @@ CREATE TABLE `malt` (
   PRIMARY KEY (`id`),
   KEY `FKgi7s3mxr1aerq57snqlvguof9` (`place_id`),
   CONSTRAINT `FKgi7s3mxr1aerq57snqlvguof9` FOREIGN KEY (`place_id`) REFERENCES `place` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -264,7 +266,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `other_ingredient`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `other_ingredient` (
   `id` bigint NOT NULL,
   `brand` varchar(255) DEFAULT NULL,
@@ -275,7 +277,7 @@ CREATE TABLE `other_ingredient` (
   PRIMARY KEY (`id`),
   KEY `FKk12rbt309uu3sv4u32vsjcka9` (`place_id`),
   CONSTRAINT `FKk12rbt309uu3sv4u32vsjcka9` FOREIGN KEY (`place_id`) REFERENCES `place` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -294,7 +296,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `password_reset_token`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `password_reset_token` (
   `id` bigint NOT NULL,
   `expiry_date` date NOT NULL,
@@ -304,7 +306,7 @@ CREATE TABLE `password_reset_token` (
   UNIQUE KEY `UK_g0guo4k8krgpwuagos61oc06j` (`token`),
   KEY `FK5lwtbncug84d4ero33v3cfxvl` (`user_id`),
   CONSTRAINT `FK5lwtbncug84d4ero33v3cfxvl` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -322,14 +324,14 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `place`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `place` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `city` varchar(255) DEFAULT NULL,
   `coordinates` varchar(255) DEFAULT NULL,
   `country` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -348,7 +350,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `rating`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `rating` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_date` datetime(6) DEFAULT NULL,
@@ -360,7 +362,7 @@ CREATE TABLE `rating` (
   KEY `FKpn05vbx6usw0c65tcyuce4dw5` (`user_id`),
   CONSTRAINT `FK6x7y7iu3omnr3wcg93jkfdorb` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`),
   CONSTRAINT `FKpn05vbx6usw0c65tcyuce4dw5` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -379,7 +381,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `recipe`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `recipe` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `batch_size` double DEFAULT NULL,
@@ -406,7 +408,7 @@ CREATE TABLE `recipe` (
   KEY `FKc8o8io8s0f7nqcd3429u6cxjs` (`user_id`),
   CONSTRAINT `FKc8o8io8s0f7nqcd3429u6cxjs` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `FKq176yxhufnb30ybalxxhirfj4` FOREIGN KEY (`place_id`) REFERENCES `place` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -425,7 +427,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `recipe_event`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `recipe_event` (
   `type` varchar(31) NOT NULL,
   `id` bigint NOT NULL AUTO_INCREMENT,
@@ -437,7 +439,7 @@ CREATE TABLE `recipe_event` (
   PRIMARY KEY (`id`),
   KEY `FK5ricvlj3n0833lm050h09qpfc` (`recipe_id`),
   CONSTRAINT `FK5ricvlj3n0833lm050h09qpfc` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=177 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -456,7 +458,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `refresh_token`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `refresh_token` (
   `id` bigint NOT NULL,
   `expiry_date` date NOT NULL,
@@ -466,7 +468,7 @@ CREATE TABLE `refresh_token` (
   UNIQUE KEY `UK_r4k4edos30bx9neoq81mdvwph` (`token`),
   KEY `FKfgk1klcib7i15utalmcqo7krt` (`user_id`),
   CONSTRAINT `FKfgk1klcib7i15utalmcqo7krt` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -484,12 +486,12 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `role`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `role` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `name` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -508,7 +510,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `scheduling`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `scheduling` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_date` datetime(6) DEFAULT NULL,
@@ -519,7 +521,7 @@ CREATE TABLE `scheduling` (
   KEY `FKrvbe4ivrug8qsqkhy0rc6uk6g` (`user_id`),
   CONSTRAINT `FKcwir0k135w1o8y1hxyauyo9ro` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`),
   CONSTRAINT `FKrvbe4ivrug8qsqkhy0rc6uk6g` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -538,7 +540,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `to_brew`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `to_brew` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_date` datetime(6) DEFAULT NULL,
@@ -550,7 +552,7 @@ CREATE TABLE `to_brew` (
   KEY `FKkxa2cd3teostyr0vfx3cor9qj` (`user_id`),
   CONSTRAINT `FKkpat6mm7c52bnk6l3flx5h4fb` FOREIGN KEY (`recipe_id`) REFERENCES `recipe` (`id`),
   CONSTRAINT `FKkxa2cd3teostyr0vfx3cor9qj` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -569,7 +571,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `user`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `user` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `created_date` datetime(6) DEFAULT NULL,
@@ -582,7 +584,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `UKsb8bbouer5wak8vyiiy4pf2bx` (`username`),
   UNIQUE KEY `UKob8kqyqqgmefl0aco34akdtpe` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -601,7 +603,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `user_roles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `user_roles` (
   `user_id` bigint NOT NULL,
   `role_id` bigint NOT NULL,
@@ -609,7 +611,7 @@ CREATE TABLE `user_roles` (
   KEY `FKrhfovtciq1l558cw6udg0h0d3` (`role_id`),
   CONSTRAINT `FK55itppkw3i07do3h7qoclqd4k` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
   CONSTRAINT `FKrhfovtciq1l558cw6udg0h0d3` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -628,7 +630,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `verification_token`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `verification_token` (
   `id` bigint NOT NULL,
   `expiry_date` date NOT NULL,
@@ -638,7 +640,7 @@ CREATE TABLE `verification_token` (
   UNIQUE KEY `UK_p678btf3r9yu6u8aevyb4ff0m` (`token`),
   KEY `FKrdn0mss276m9jdobfhhn2qogw` (`user_id`),
   CONSTRAINT `FKrdn0mss276m9jdobfhhn2qogw` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -656,7 +658,7 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `yeast`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!50503 SET character_set_client = utf8 */;
 CREATE TABLE `yeast` (
   `id` bigint NOT NULL,
   `brand` varchar(255) DEFAULT NULL,
@@ -674,7 +676,7 @@ CREATE TABLE `yeast` (
   PRIMARY KEY (`id`),
   KEY `FKg6qte7tul3p06bcatos77vpvl` (`place_id`),
   CONSTRAINT `FKg6qte7tul3p06bcatos77vpvl` FOREIGN KEY (`place_id`) REFERENCES `place` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

@@ -54,7 +54,7 @@ import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
 import io.jsonwebtoken.io.Encoders;
 
-@Component
+// @Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
