@@ -70,14 +70,14 @@ public class DatabaseLoader implements CommandLineRunner {
 					.configure("hibernate.cfg.xml");
 
 		//get system environment variables in Heroku environment
-		if (null != System.getenv("JDBC_CONNECTION_URL")) {
-			configuration.setProperty("hibernate.connection.url", System.getenv("JDBC_CONNECTION_URL"));
+		if (null != System.getenv("SPRING_DATASOURCE_URL")) {
+			configuration.setProperty("hibernate.connection.url", System.getenv("SPRING_DATASOURCE_URL"));
 		}
-		if (null != System.getenv("JDBC_CONNECTION_USERNAME")) {
-			configuration.setProperty("hibernate.connection.username", System.getenv("JDBC_CONNECTION_USERNAME"));
+		if (null != System.getenv("SPRING_DATASOURCE_USERNAME")) {
+			configuration.setProperty("hibernate.connection.username", System.getenv("SPRING_DATASOURCE_USERNAME"));
 		}
-		if (null != System.getenv("JDBC_CONNECTION_PASSWORD")) {
-			configuration.setProperty("hibernate.connection.password", System.getenv("JDBC_CONNECTION_USERNAME"));
+		if (null != System.getenv("SPRING_DATASOURCE_PASSWORD")) {
+			configuration.setProperty("hibernate.connection.password", System.getenv("SPRING_DATASOURCE_PASSWORD"));
 		}
 		SessionFactory factory = configuration
 								.addAnnotatedClass(User.class)
