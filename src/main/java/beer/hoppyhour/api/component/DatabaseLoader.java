@@ -64,36 +64,50 @@ public class DatabaseLoader implements CommandLineRunner {
 
 	@Override
 	public void run(String... strings) throws Exception {
-		SessionFactory factory = new Configuration()
-					.configure("hibernate.cfg.xml")
-					.addAnnotatedClass(User.class)
-					.addAnnotatedClass(Recipe.class)
-					.addAnnotatedClass(Brewed.class)
-					.addAnnotatedClass(Brewing.class)
-					.addAnnotatedClass(Scheduling.class)
-					.addAnnotatedClass(ToBrew.class)
-					.addAnnotatedClass(Ingredient.class)
-					.addAnnotatedClass(IngredientDetail.class)
-					.addAnnotatedClass(Malt.class)
-					.addAnnotatedClass(Hop.class)
-					.addAnnotatedClass(Yeast.class)
-					.addAnnotatedClass(OtherIngredient.class)
-					.addAnnotatedClass(HopDetail.class)
-					.addAnnotatedClass(MaltDetail.class)
-					.addAnnotatedClass(YeastDetail.class)
-					.addAnnotatedClass(OtherIngredientDetail.class)
-					.addAnnotatedClass(Rating.class)
-					.addAnnotatedClass(Comment.class)
-					.addAnnotatedClass(Reply.class)
-					.addAnnotatedClass(RecipeEvent.class)
-					.addAnnotatedClass(TemperatureRecipeEvent.class)
-					.addAnnotatedClass(IngredientDetailRecipeEvent.class)
-					.addAnnotatedClass(Place.class)
-					.addAnnotatedClass(Role.class)
-					.addAnnotatedClass(RefreshToken.class)
-					.addAnnotatedClass(VerificationToken.class)
-					.addAnnotatedClass(PasswordResetToken.class)
-					.buildSessionFactory();
+		
+
+		Configuration configuration = new Configuration()
+					.configure("hibernate.cfg.xml");
+
+		//get system environment variables in Heroku environment
+		if (null != System.getenv("JDBC_CONNECTION_URL")) {
+			configuration.setProperty("hibernate.connection.url", System.getenv("JDBC_CONNECTION_URL"));
+		}
+		if (null != System.getenv("JDBC_CONNECTION_USERNAME")) {
+			configuration.setProperty("hibernate.connection.username", System.getenv("JDBC_CONNECTION_USERNAME"));
+		}
+		if (null != System.getenv("JDBC_CONNECTION_PASSWORD")) {
+			configuration.setProperty("hibernate.connection.password", System.getenv("JDBC_CONNECTION_USERNAME"));
+		}
+		SessionFactory factory = configuration
+								.addAnnotatedClass(User.class)
+								.addAnnotatedClass(Recipe.class)
+								.addAnnotatedClass(Brewed.class)
+								.addAnnotatedClass(Brewing.class)
+								.addAnnotatedClass(Scheduling.class)
+								.addAnnotatedClass(ToBrew.class)
+								.addAnnotatedClass(Ingredient.class)
+								.addAnnotatedClass(IngredientDetail.class)
+								.addAnnotatedClass(Malt.class)
+								.addAnnotatedClass(Hop.class)
+								.addAnnotatedClass(Yeast.class)
+								.addAnnotatedClass(OtherIngredient.class)
+								.addAnnotatedClass(HopDetail.class)
+								.addAnnotatedClass(MaltDetail.class)
+								.addAnnotatedClass(YeastDetail.class)
+								.addAnnotatedClass(OtherIngredientDetail.class)
+								.addAnnotatedClass(Rating.class)
+								.addAnnotatedClass(Comment.class)
+								.addAnnotatedClass(Reply.class)
+								.addAnnotatedClass(RecipeEvent.class)
+								.addAnnotatedClass(TemperatureRecipeEvent.class)
+								.addAnnotatedClass(IngredientDetailRecipeEvent.class)
+								.addAnnotatedClass(Place.class)
+								.addAnnotatedClass(Role.class)
+								.addAnnotatedClass(RefreshToken.class)
+								.addAnnotatedClass(VerificationToken.class)
+								.addAnnotatedClass(PasswordResetToken.class)
+								.buildSessionFactory();
 		Session session = factory.getCurrentSession();
 		try {
 			session.beginTransaction();
