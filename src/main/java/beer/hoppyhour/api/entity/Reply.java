@@ -6,10 +6,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @DiscriminatorValue("reply")
 public class Reply extends Comment {
     
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,

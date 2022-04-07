@@ -4,10 +4,13 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @DiscriminatorValue("ingredient")
 public class IngredientDetailRecipeEvent<T extends IngredientDetail<T>> extends RecipeEvent {
     
+    @JsonBackReference
     @OneToOne(mappedBy = "event",
     targetEntity = IngredientDetail.class)
     private IngredientDetail<T> ingredientDetail;

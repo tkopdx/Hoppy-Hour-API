@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -43,6 +44,7 @@ public class Comment {
     @Column(name = "id")
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -52,6 +54,7 @@ public class Comment {
     @JoinColumn(name = "user_id")
     private User user;
     
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,

@@ -16,6 +16,8 @@ import javax.persistence.InheritanceType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 @Entity
 @Table(name = "ingredient")
@@ -40,6 +42,7 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
             columnDefinition = "TEXT(10000)") //Inluding a max text length may be MySQL specific
     private String description;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "ingredient",
                 cascade = CascadeType.ALL,
                 targetEntity = IngredientDetail.class,

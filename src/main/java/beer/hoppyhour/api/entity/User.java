@@ -27,6 +27,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,6 +39,7 @@ import org.hibernate.annotations.UpdateTimestamp;
             @UniqueConstraint(columnNames = "username"),
             @UniqueConstraint(columnNames = "email")
         })
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User {
 
     @Id
@@ -110,14 +112,17 @@ public class User {
                 cascade = CascadeType.ALL)
     private List<ToBrew> toBrews;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
     private List<Rating> ratings;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
     private List<Reply> replies;

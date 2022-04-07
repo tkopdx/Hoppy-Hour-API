@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
@@ -23,6 +25,7 @@ public class Rating {
     @Column(name = "id")
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -31,7 +34,8 @@ public class Rating {
     })
     @JoinColumn(name = "user_id")
     private User user;
-
+    
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,

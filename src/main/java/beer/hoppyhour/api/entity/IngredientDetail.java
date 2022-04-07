@@ -16,6 +16,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import org.hibernate.annotations.DiscriminatorOptions;
 
 @Entity
@@ -40,6 +44,7 @@ public abstract class IngredientDetail<T extends IngredientDetail<T>> {
             columnDefinition = "TEXT(10000)")
     private String notes;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -49,6 +54,8 @@ public abstract class IngredientDetail<T extends IngredientDetail<T>> {
     @JoinColumn(name = "recipe_id")
     private Recipe recipe;
 
+    @JsonManagedReference
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -60,6 +67,8 @@ public abstract class IngredientDetail<T extends IngredientDetail<T>> {
     @JoinColumn(name = "ingredient_id")
     private Ingredient<T> ingredient;
 
+    @JsonManagedReference
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToOne(cascade = CascadeType.ALL,
         targetEntity = IngredientDetailRecipeEvent.class)
     @JoinColumn(name = "recipe_event_id", referencedColumnName = "id")

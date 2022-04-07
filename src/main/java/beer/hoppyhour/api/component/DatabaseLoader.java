@@ -54,7 +54,7 @@ import beer.hoppyhour.api.model.place.MunichType;
 import beer.hoppyhour.api.model.yeast._1056AmericanAle;
 import io.jsonwebtoken.io.Encoders;
 
-// @Component
+@Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
@@ -808,7 +808,8 @@ public class DatabaseLoader implements CommandLineRunner {
 
 	private Recipe getFakeRecipe() {
 		String name = faker.beer().name();
-		Double fakeGravity = faker.number().randomDouble(3, 1, 2);
+		Double fakeOg = faker.number().randomDouble(3, 1, 2);
+		Double fakeFg = faker.number().randomDouble(3, 1, 2);
 		String method = faker.beer().malt();
 		String style = faker.beer().style();
 		Double fakeTime = faker.number().randomDouble(2, 1, 90);
@@ -821,15 +822,15 @@ public class DatabaseLoader implements CommandLineRunner {
 
 		Recipe recipe = new Recipe(
 				name,
-				fakeGravity,
-				fakeGravity,
+				fakeOg,
+				fakeFg,
 				method,
 				style,
 				fakeTime,
 				fakeSize,
 				fakeSize,
 				fakeSize,
-				fakeGravity,
+				fakeOg,
 				fakeEfficiency,
 				fakeEfficiency,
 				fakeIbu,

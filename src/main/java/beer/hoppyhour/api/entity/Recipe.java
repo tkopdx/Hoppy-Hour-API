@@ -18,11 +18,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "recipe")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Recipe {
     
     @Id
@@ -82,6 +86,9 @@ public class Recipe {
     @Column(name = "cost")
     private Double cost;
 
+    @Column(name = "abv")
+    private Double abv;
+
     @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
@@ -93,46 +100,60 @@ public class Recipe {
     @JoinColumn(name = "user_id")
     private User user;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<Brewed> breweds;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<Brewing> brewings;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<Scheduling> schedulings;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<ToBrew> toBrews;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<HopDetail> hopDetails;
-
+    
+    @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<MaltDetail> maltDetails;
-
+    
+    @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<YeastDetail> yeastDetails;
-
+    
+    @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<OtherIngredientDetail> otherIngredientDetails;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<Rating> ratings;
 
+    @Column(name = "rating")
+    private Double rating;
+
+    @JsonManagedReference
     @OneToMany(mappedBy = "user",
                 cascade = CascadeType.ALL)
     private List<Comment> comments;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
     cascade = CascadeType.ALL)
     private List<RecipeEvent> events;
@@ -169,6 +190,7 @@ public class Recipe {
         this.srm = srm;
         this.mashpH = mashpH;
         this.cost = cost;
+        this.abv = calculateAbv(originalGravity, finalGravity);
     }
 
     @Override
@@ -178,6 +200,11 @@ public class Recipe {
                 + ", id=" + id + ", mashpH=" + mashpH + ", method=" + method + ", name=" + name + ", originalGravity="
                 + originalGravity + ", postBoilSize=" + postBoilSize + ", preBoilGravity=" + preBoilGravity
                 + ", preBoilSize=" + preBoilSize + ", srm=" + srm + ", style=" + style + ", user=" + user + "]";
+    }
+
+    private Double calculateAbv(Double og, Double fg) {
+        System.out.println("going to do some math! " + (og - fg) * 131.25);
+        return (og - fg) * 131.25;
     }
 
     public String getName() {
@@ -396,6 +423,7 @@ public class Recipe {
 
         ratings.add(rating);
         rating.setRecipe(this);
+        calculateRating();
     }
 
     public void addComment(Comment comment) {
@@ -422,5 +450,134 @@ public class Recipe {
 
     public void setPlace(Place place) {
         this.place = place;
+    }
+
+    private void calculateRating() {
+        long total = 0;
+        for (Rating r: this.ratings) {
+            total += r.getRating();
+        }
+        Double rating = (double) total / this.ratings.size();
+        this.setRating(rating);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Timestamp getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Timestamp createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Double getAbv() {
+        return abv;
+    }
+
+    public void setAbv(Double abv) {
+        this.abv = abv;
+    }
+
+    public List<Brewed> getBreweds() {
+        return breweds;
+    }
+
+    public void setBreweds(List<Brewed> breweds) {
+        this.breweds = breweds;
+    }
+
+    public List<Brewing> getBrewings() {
+        return brewings;
+    }
+
+    public void setBrewings(List<Brewing> brewings) {
+        this.brewings = brewings;
+    }
+
+    public List<Scheduling> getSchedulings() {
+        return schedulings;
+    }
+
+    public void setSchedulings(List<Scheduling> schedulings) {
+        this.schedulings = schedulings;
+    }
+
+    public List<ToBrew> getToBrews() {
+        return toBrews;
+    }
+
+    public void setToBrews(List<ToBrew> toBrews) {
+        this.toBrews = toBrews;
+    }
+
+    public List<HopDetail> getHopDetails() {
+        return hopDetails;
+    }
+
+    public void setHopDetails(List<HopDetail> hopDetails) {
+        this.hopDetails = hopDetails;
+    }
+
+    public List<MaltDetail> getMaltDetails() {
+        return maltDetails;
+    }
+
+    public void setMaltDetails(List<MaltDetail> maltDetails) {
+        this.maltDetails = maltDetails;
+    }
+
+    public List<YeastDetail> getYeastDetails() {
+        return yeastDetails;
+    }
+
+    public void setYeastDetails(List<YeastDetail> yeastDetails) {
+        this.yeastDetails = yeastDetails;
+    }
+
+    public List<OtherIngredientDetail> getOtherIngredientDetails() {
+        return otherIngredientDetails;
+    }
+
+    public void setOtherIngredientDetails(List<OtherIngredientDetail> otherIngredientDetails) {
+        this.otherIngredientDetails = otherIngredientDetails;
+    }
+
+    public List<Rating> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(List<Rating> ratings) {
+        this.ratings = ratings;
+    }
+
+    public Double getRating() {
+        return rating;
+    }
+
+    public void setRating(Double rating) {
+        this.rating = rating;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public List<RecipeEvent> getEvents() {
+        return events;
+    }
+
+    public void setEvents(List<RecipeEvent> events) {
+        this.events = events;
     }
 }

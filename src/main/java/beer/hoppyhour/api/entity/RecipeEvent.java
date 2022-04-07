@@ -15,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "recipe_event")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -36,6 +38,7 @@ public class RecipeEvent {
     @Column(name = "pause")
     private Boolean pause;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
