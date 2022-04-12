@@ -42,6 +42,7 @@ public class Place {
     mappedBy = "place")
     private List<Recipe> recipes;
 
+    @JsonManagedReference
     @OneToMany(cascade =  {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -51,6 +52,7 @@ public class Place {
     mappedBy = "place")
     private List<Hop> hops;
 
+    @JsonManagedReference
     @OneToMany(cascade =  {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -60,6 +62,7 @@ public class Place {
     mappedBy = "place")
     private List<Malt> malts;
 
+    @JsonManagedReference
     @OneToMany(cascade =  {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -69,6 +72,7 @@ public class Place {
     mappedBy = "place")
     private List<Yeast> yeasts;
 
+    @JsonManagedReference
     @OneToMany(cascade =  {
         CascadeType.PERSIST,
         CascadeType.MERGE,

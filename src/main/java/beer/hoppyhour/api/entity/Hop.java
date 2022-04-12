@@ -7,6 +7,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "hop")
 public class Hop extends Ingredient<HopDetail> {
@@ -20,6 +22,7 @@ public class Hop extends Ingredient<HopDetail> {
     @Column(name = "average_alpha_acid_high")
     private Double averageAlphaAcidHigh;
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,

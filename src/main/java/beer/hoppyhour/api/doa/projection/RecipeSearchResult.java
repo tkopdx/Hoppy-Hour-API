@@ -1,13 +1,14 @@
 package beer.hoppyhour.api.doa.projection;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
+//TODO settle on a final version
 public interface RecipeSearchResult {
     String getName();
     Long getId();
     String getStyle();
     String getMethod();
-    Timestamp getCreatedDate();
+    Instant getCreatedDate();
     Double getAbv();
     Double getSrm();
     Double getIbu();

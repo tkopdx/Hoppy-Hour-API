@@ -10,9 +10,13 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,11 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.projection.RecipeSearchResult;
 import beer.hoppyhour.api.entity.Recipe;
+import beer.hoppyhour.api.entity.User;
+import beer.hoppyhour.api.payload.request.PostRecipeRequest;
 import beer.hoppyhour.api.payload.response.MessageResponse;
 import beer.hoppyhour.api.payload.response.PagingHeaders;
 import beer.hoppyhour.api.payload.response.PagingResponse;
+import beer.hoppyhour.api.payload.response.UserPublicInfoResponse;
+import beer.hoppyhour.api.security.services.UserDetailsImpl;
 import beer.hoppyhour.api.service.RecipePagingResponseService;
 import beer.hoppyhour.api.service.RecipeService;
+import beer.hoppyhour.api.service.UserService;
 import net.kaczmarzyk.spring.data.jpa.domain.Between;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
@@ -41,6 +50,9 @@ public class RecipeController {
     @Autowired
     RecipeService recipeService;
 
+    @Autowired
+    UserService userService;
+
     // TODO get recipes with filtering, ordering, sorting
     @Transactional
     @GetMapping("")
@@ -48,7 +60,8 @@ public class RecipeController {
     public ResponseEntity<List<RecipeSearchResult>> get(
             @And({
                     @Spec(path = "name", params = "name", spec = Like.class),
-                    @Spec(path = "createdDate", params = "createdDate", spec = Equal.class),
+                    //TODO This is broken right now. Fix string to instant conversion
+                    // @Spec(path = "createdDate", params = { "createdDateGt", "createdDateLt"}, spec = Between.class, config = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX'Z'"),
                     @Spec(path = "method", params = "method", spec = Like.class),
                     @Spec(path = "style", params = "style", spec = Like.class),
                     @Spec(path = "place.country", params = "country", spec = Like.class),
@@ -93,8 +106,47 @@ public class RecipeController {
         }
     }
 
+    //TODO get the recipe author's public info
+    @GetMapping("/{id}/user")
+    public ResponseEntity<?> getRecipeAuthorInfo(@PathVariable Long id) {
+        try {
+            User user = recipeService.getRecipeById(id).getUser();
+            return ResponseEntity.ok().body(
+                new UserPublicInfoResponse(
+                    user.getUsername(), 
+                    user.getCreatedDate(),
+                    user.getId())
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));
+        }
+    }
     // TODO add a recipe if a user
-
+    @PostMapping("")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> addNewRecipe(@RequestBody PostRecipeRequest request, Authentication authentication) {
+        try {
+            //get the currently logged in user
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            User user = userService.getUser(userDetails.getId());
+            //process required recipe fields
+            Recipe recipe = recipeService.createNewRecipe(request, user);
+            //set ingredient details and events
+            recipe = recipeService.setIngredientDetailsAndEvents(request, recipe);
+            //return good response with new recipe info
+            return ResponseEntity.ok().body(
+                recipe
+            );
+        } catch (Exception e) {
+            //return bad response
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error! " + e.getMessage()
+                )
+            );
+        }
+        
+    }
     // TODO delete a recipe if user id matches recipe user id
 
     // TODO edit a recipe if user id matches recipe user id

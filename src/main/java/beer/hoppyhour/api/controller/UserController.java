@@ -173,7 +173,8 @@ public class UserController {
             return ResponseEntity.ok().body(
                 new UserPublicInfoResponse(
                     user.getUsername(), 
-                    user.getCreatedDate())
+                    user.getCreatedDate(),
+                    user.getId())
             );
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new MessageResponse(e.getMessage()));

@@ -67,6 +67,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/test/**").permitAll()
                 .antMatchers("/api/users/**/public").permitAll()
                 .antMatchers("/api/recipes").permitAll()
+                //TODO decide what recipe/ endpoints to permitAll and which to deny
                 .antMatchers("/api/recipes/**").permitAll()
                 .antMatchers("/api/users").denyAll()
                 .anyRequest().authenticated();

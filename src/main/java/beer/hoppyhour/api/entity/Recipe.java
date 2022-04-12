@@ -1,6 +1,6 @@
 package beer.hoppyhour.api.entity;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class Recipe {
 
     @CreationTimestamp
     @Column(name = "created_date", updatable = false)
-    private Timestamp createdDate;
+    private Instant createdDate;
 
     @Column(name = "name")
     private String name;
@@ -142,7 +142,8 @@ public class Recipe {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
-                cascade = CascadeType.ALL)
+                cascade = CascadeType.ALL,
+                fetch = FetchType.LAZY)
     private List<Rating> ratings;
 
     @Column(name = "rating")
@@ -150,7 +151,8 @@ public class Recipe {
 
     @JsonManagedReference
     @OneToMany(mappedBy = "user",
-                cascade = CascadeType.ALL)
+                cascade = CascadeType.ALL,
+                fetch = FetchType.LAZY)
     private List<Comment> comments;
 
     @JsonManagedReference
@@ -203,7 +205,6 @@ public class Recipe {
     }
 
     private Double calculateAbv(Double og, Double fg) {
-        System.out.println("going to do some math! " + (og - fg) * 131.25);
         return (og - fg) * 131.25;
     }
 
@@ -469,11 +470,11 @@ public class Recipe {
         this.id = id;
     }
 
-    public Timestamp getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Timestamp createdDate) {
+    public void setCreatedDate(Instant createdDate) {
         this.createdDate = createdDate;
     }
 

@@ -29,6 +29,7 @@ public class RecipePagingResponseService implements IPagingResponseService<Recip
         if (isRequestedPage(headers)) {
             return get(spec, buildPageRequest(headers, sort));
         } else {
+            //TODO figure out where to check for these headers
             headers.set(PagingHeaders.PAGE_NUMBER.getName(), "0");
             headers.set(PagingHeaders.PAGE_SIZE.getName(), "20");
             return get(spec, buildPageRequest(headers, sort));

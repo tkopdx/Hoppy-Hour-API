@@ -6,10 +6,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "other_ingredient")
 public class OtherIngredient extends Ingredient<OtherIngredientDetail> {
 
+    @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,

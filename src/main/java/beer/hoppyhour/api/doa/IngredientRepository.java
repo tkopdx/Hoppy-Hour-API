@@ -6,6 +6,6 @@ import beer.hoppyhour.api.entity.Ingredient;
 
 //TODO Creating a repository from a raw type may be poor practice.
 //See IngredientDetailRepository for similar issue and rationale.
-public interface IngredientRepository extends PagingAndSortingRepository<Ingredient, Long> {
+public interface IngredientRepository extends PagingAndSortingRepository<Ingredient<?>, Long> {
 
 }
