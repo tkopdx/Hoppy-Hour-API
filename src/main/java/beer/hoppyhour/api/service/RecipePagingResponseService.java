@@ -1,7 +1,7 @@
 package beer.hoppyhour.api.service;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -9,13 +9,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
 import beer.hoppyhour.api.doa.RecipeRepository;
 import beer.hoppyhour.api.doa.projection.RecipeSearchResult;
+import beer.hoppyhour.api.entity.Ingredient;
+import beer.hoppyhour.api.entity.IngredientDetail;
 import beer.hoppyhour.api.entity.Recipe;
-import beer.hoppyhour.api.payload.response.PagingHeaders;
 import beer.hoppyhour.api.payload.response.PagingResponse;
 
 @Service
@@ -25,15 +25,14 @@ public class RecipePagingResponseService implements IPagingResponseService<Recip
     RecipeRepository recipeRepository;
 
     @Override
-    public PagingResponse<RecipeSearchResult> get(Specification<Recipe> spec, HttpHeaders headers, Sort sort) {
-        if (isRequestedPage(headers)) {
-            return get(spec, buildPageRequest(headers, sort));
-        } else {
-            //TODO figure out where to check for these headers
-            headers.set(PagingHeaders.PAGE_NUMBER.getName(), "0");
-            headers.set(PagingHeaders.PAGE_SIZE.getName(), "20");
-            return get(spec, buildPageRequest(headers, sort));
+    public PagingResponse<RecipeSearchResult> get(Specification<Recipe> spec, Long pageSize, Long pageNumber, Sort sort) {
+        if (!includesPageSizeAndPageNumber(pageSize, pageNumber)) {
+            //default values
+            pageSize = Long.valueOf(20);
+            pageNumber = Long.valueOf(0);
         }
+
+        return get(spec, buildPageRequest(pageSize, pageNumber, sort));
     }
 
     @Override
@@ -51,15 +50,36 @@ public class RecipePagingResponseService implements IPagingResponseService<Recip
     }
 
     @Override
-    public Boolean isRequestedPage(HttpHeaders headers) {
-        return (headers.containsKey(PagingHeaders.PAGE_NUMBER.getName()) && headers.containsKey(PagingHeaders.PAGE_SIZE.getName()));
+    public Boolean includesPageSizeAndPageNumber(Long pageSize, Long pageNumber) {
+        return (pageSize != null && pageNumber != null);
     }
 
     @Override
-    public Pageable buildPageRequest(HttpHeaders headers, Sort sort) {
-        int page = Integer.parseInt(Objects.requireNonNull(headers.get(PagingHeaders.PAGE_NUMBER.getName())).get(0));
-        int size = Integer.parseInt(Objects.requireNonNull(headers.get(PagingHeaders.PAGE_SIZE.getName())).get(0));
-        return PageRequest.of(page, size, sort);
+    public Pageable buildPageRequest(Long pageSize, Long pageNumber, Sort sort) {
+        return PageRequest.of(pageNumber.intValue(), pageSize.intValue(), sort);
+    }
+
+    public PagingResponse<RecipeSearchResult> getAllByExample(Set<Ingredient<? extends IngredientDetail<?>>> ingredients, Long pageSize, Long pageNumber, Sort sort) {
+        if (!includesPageSizeAndPageNumber(pageSize, pageNumber)) {
+            //default values
+            pageSize = Long.valueOf(20);
+            pageNumber = Long.valueOf(0);
+        }
+
+        return get(ingredients, buildPageRequest(pageSize, pageNumber, sort));
+    }
+
+    public PagingResponse<RecipeSearchResult> get(Set<Ingredient<? extends IngredientDetail<?>>> ingredients, Pageable pageable) {
+        Page<RecipeSearchResult> page = recipeRepository.findAllByIngredientsWithPagination(ingredients, ingredients.size(), pageable);
+        List<RecipeSearchResult> data = page.getContent();
+        return new PagingResponse<RecipeSearchResult>(
+            page.getTotalElements(), 
+            (long) page.getNumber(), 
+            (long) page.getNumberOfElements(), 
+            (long) pageable.getOffset(), 
+            (long) page.getTotalPages(), 
+            data
+        );
     }
     
 }

@@ -59,6 +59,18 @@ public class RecipeService implements IRecipeService {
     @Autowired
     PlaceService placeService;
 
+    @Autowired
+    HopService hopService;
+
+    @Autowired
+    MaltService maltService;
+
+    @Autowired
+    OtherIngredientService otherIngredientService;
+
+    @Autowired
+    YeastService yeastService;
+
     @Override
     public Recipe getRecipeById(Long id) throws RecipeNotFoundException {
         Optional<Recipe> recipe = recipeRepository.findById(id);
@@ -116,6 +128,8 @@ public class RecipeService implements IRecipeService {
                         recipe.addHopDetail(hopDetail);
                         //link recipe to event
                         recipe.addEvent(hopEvent);
+                        //link recipe and ingredient
+                        recipe.addIngredient(hopDetail.getIngredient());
                         break;
                     case "malt":
                         MaltDetail maltDetail = maltDetailService.createNewDetail(detailEvent);
@@ -123,6 +137,7 @@ public class RecipeService implements IRecipeService {
                         maltDetail.setEvent(maltEvent);
                         recipe.addMaltDetail(maltDetail);
                         recipe.addEvent(maltEvent);
+                        recipe.addIngredient(maltDetail.getIngredient());
                         break;
                     case "other":
                         OtherIngredientDetail otherIngredientDetail = otherIngredientDetailService
@@ -131,6 +146,7 @@ public class RecipeService implements IRecipeService {
                         otherIngredientDetail.setEvent(otherEvent);
                         recipe.addOtherIngredientDetail(otherIngredientDetail);
                         recipe.addEvent(otherEvent);
+                        recipe.addIngredient(otherIngredientDetail.getIngredient());
                         break;
                     case "yeast":
                         YeastDetail yeastDetail = yeastDetailService.createNewDetail(detailEvent);
@@ -138,6 +154,7 @@ public class RecipeService implements IRecipeService {
                         yeastDetail.setEvent(yeastEvent);
                         recipe.addYeastDetail(yeastDetail);
                         recipe.addEvent(yeastEvent);
+                        recipe.addIngredient(yeastDetail.getIngredient());
                         break;
                 }
             } else if (detailEvent.getTemperature() != null) {

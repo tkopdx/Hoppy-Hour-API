@@ -2,7 +2,9 @@ package beer.hoppyhour.api.entity;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +15,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -48,6 +51,10 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
                 targetEntity = IngredientDetail.class,
                 fetch = FetchType.LAZY)
     private List<T> ingredientDetails;
+
+    @JsonBackReference
+    @ManyToMany(mappedBy = "ingredients")
+    private Set<Recipe> recipes = new HashSet<>();
 
     public Ingredient() {}
 
@@ -109,6 +116,10 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
         ingredientDetail.setIngredient(this);
     }
 
+    public void addRecipe(Recipe recipe) {
+        recipes.add(recipe);
+    }
+
     @Override
     public String toString() {
         return "Ingredient [brand=" + brand + ", description=" + description + ", id=" + id + ", image=" + image
@@ -121,5 +132,13 @@ public abstract class Ingredient<T extends IngredientDetail<T>> {
 
     public void setIngredientDetails(List<T> ingredientDetails) {
         this.ingredientDetails = ingredientDetails;
+    }
+
+    public Set<Recipe> getRecipes() {
+        return recipes;
+    }
+
+    public void setRecipes(Set<Recipe> recipes) {
+        this.recipes = recipes;
     }
 }

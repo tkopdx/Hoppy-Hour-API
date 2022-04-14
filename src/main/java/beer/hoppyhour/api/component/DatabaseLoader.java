@@ -463,6 +463,8 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addHopDetail(detail2);
 				recipeFromDB.addHopDetail(detail3);
 
+				recipeFromDB.addIngredient(hopFromDB);
+
 				recipeFromDB.addEvent(hopEvent1);
 				recipeFromDB.addEvent(hopEvent2);
 				recipeFromDB.addEvent(hopEvent3);
@@ -503,6 +505,8 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addMaltDetail(detail1);
 				recipeFromDB.addMaltDetail(detail2);
 				recipeFromDB.addMaltDetail(detail3);
+
+				recipeFromDB.addIngredient(maltFromDB);
 
 				recipeFromDB.addEvent(maltEvent1);
 				recipeFromDB.addEvent(maltEvent2);
@@ -545,6 +549,8 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addOtherIngredientDetail(detail2);
 				recipeFromDB.addOtherIngredientDetail(detail3);
 
+				recipeFromDB.addIngredient(otherIngredientFromDB);
+
 				recipeFromDB.addEvent(otherEvent1);
 				recipeFromDB.addEvent(otherEvent2);
 				recipeFromDB.addEvent(otherEvent3);
@@ -584,6 +590,8 @@ public class DatabaseLoader implements CommandLineRunner {
 				recipeFromDB.addYeastDetail(detail1);
 				recipeFromDB.addYeastDetail(detail2);
 				recipeFromDB.addYeastDetail(detail3);
+
+				recipeFromDB.addIngredient(yeastFromDB);
 
 				recipeFromDB.addEvent(yeastEvent1);
 				recipeFromDB.addEvent(yeastEvent2);

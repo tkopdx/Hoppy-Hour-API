@@ -1,5 +1,7 @@
 package beer.hoppyhour.api.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,7 @@ import beer.hoppyhour.api.entity.OtherIngredientDetail;
 import beer.hoppyhour.api.payload.request.PostRecipeRequestDetailEvent;
 
 @Service
-public class OtherIngredientDetailService implements IIngredientDetailService<OtherIngredientDetail> {
+public class OtherIngredientDetailService implements IIngredientDetailService<OtherIngredientDetail, OtherIngredient> {
 
     @Autowired
     OtherIngredientDetailRepository otherIngredientDetailRepository;
@@ -44,6 +46,17 @@ public class OtherIngredientDetailService implements IIngredientDetailService<Ot
         } else {
             return null;
         }
+    }
+
+    @Override
+    public List<OtherIngredientDetail> createDetailsForExampleSearch(List<OtherIngredient> ingredients) {
+        List<OtherIngredientDetail> otherIngredientDetails = new ArrayList<>();
+        for (OtherIngredient otherIngredient: ingredients) {
+            OtherIngredientDetail detail = new OtherIngredientDetail();
+            detail.setIngredient(otherIngredient);
+            otherIngredientDetails.add(detail);
+        }
+        return otherIngredientDetails;
     }
     
 }

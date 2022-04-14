@@ -1,6 +1,9 @@
 package beer.hoppyhour.api.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -24,6 +27,13 @@ public class OtherIngredientService implements IIngredientService<OtherIngredien
         } else {
             throw new EntityNotFoundException("No other ingredient with id " + id + " was found.");
         }
+    }
+
+    @Override
+    public List<OtherIngredient> getAllById(List<Long> ids) {
+        Iterable<OtherIngredient> iterableHops = otherIngredientRepository.findAllById(ids);
+        return StreamSupport.stream(iterableHops.spliterator(), false)
+        .collect(Collectors.toList());
     }
     
 }

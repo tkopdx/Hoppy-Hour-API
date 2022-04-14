@@ -1,6 +1,9 @@
 package beer.hoppyhour.api.service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.persistence.EntityNotFoundException;
 
@@ -24,6 +27,13 @@ public class YeastService implements IIngredientService<Yeast> {
         } else {
             throw new EntityNotFoundException("No yeast with id " + id + " was found.");
         }
+    }
+
+    @Override
+    public List<Yeast> getAllById(List<Long> ids) {
+        Iterable<Yeast> iterableYeasts = yeastRepository.findAllById(ids);
+        return StreamSupport.stream(iterableYeasts.spliterator(), false)
+        .collect(Collectors.toList());
     }
     
 }

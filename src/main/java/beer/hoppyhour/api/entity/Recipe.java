@@ -2,8 +2,10 @@ package beer.hoppyhour.api.entity;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -13,6 +15,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -124,6 +128,20 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe",
                 cascade = CascadeType.ALL)
     private List<HopDetail> hopDetails;
+
+    @JsonManagedReference
+    @ManyToMany(cascade = {
+        CascadeType.PERSIST,
+        CascadeType.MERGE,
+        CascadeType.DETACH,
+        CascadeType.REFRESH
+    })
+    @JoinTable(
+        name = "recipe_ingredient",
+        joinColumns = {@JoinColumn(name = "recipe_id") },
+        inverseJoinColumns = { @JoinColumn(name = "ingredient_id")}
+    )
+    private Set<Ingredient<? extends IngredientDetail<?>>> ingredients = new HashSet<>();
     
     @JsonManagedReference
     @OneToMany(mappedBy = "recipe",
@@ -462,6 +480,11 @@ public class Recipe {
         this.setRating(rating);
     }
 
+    public void addIngredient(Ingredient<? extends IngredientDetail<?>> ingredient) {
+        ingredients.add(ingredient);
+        ingredient.addRecipe(this);
+    }
+
     public Long getId() {
         return id;
     }
@@ -580,5 +603,13 @@ public class Recipe {
 
     public void setEvents(List<RecipeEvent> events) {
         this.events = events;
+    }
+
+    public Set<Ingredient<? extends IngredientDetail<?>>> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(Set<Ingredient<? extends IngredientDetail<?>>> ingredients) {
+        this.ingredients = ingredients;
     }
 }
