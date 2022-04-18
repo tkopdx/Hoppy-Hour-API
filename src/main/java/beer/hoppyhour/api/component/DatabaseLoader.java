@@ -65,6 +65,7 @@ public class DatabaseLoader implements CommandLineRunner {
 	@Override
 	public void run(String... strings) throws Exception {
 		
+		int numOfIngredients = 50;
 
 		Configuration configuration = new Configuration()
 					.configure("hibernate.cfg.xml");
@@ -137,8 +138,91 @@ public class DatabaseLoader implements CommandLineRunner {
 		} finally {
 			session.close();
 		}
+
+		for (int i = 0; i <= numOfIngredients; i++) {
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Malt malt1 = getFakeMalt();
+
+				session.save(malt1);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some malts!");
+			} finally {
+				session.close();
+			}
+		}
+
+		for (int i = 0; i <= numOfIngredients; i++) {
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Yeast yeast1 = getFakeYeast();
+
+				session.save(yeast1);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some yeasts!!");
+			} finally {
+				session.close();
+			}
+		}
+
+		for (int i = 0; i <= numOfIngredients; i++) {
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Hop amarillo = new Hop(AmarilloType.NAME + i, faker.company().name(), AmarilloType.IMAGEURL, AmarilloType.NOTES, AmarilloType.STABILITY, AmarilloType.A_L, AmarilloType.A_H);
+				// Hop cascade = new Hop(CascadeType.NAME + i, faker.company().name(), CascadeType.IMAGEURL, CascadeType.NOTES, CascadeType.STABILITY, CascadeType.A_L, CascadeType.A_H);
+				// Hop centennial = new Hop(CentennialType.NAME + i, faker.company().name(), CentennialType.IMAGEURL, CentennialType.NOTES, CentennialType.STABILITY, CentennialType.A_L, CentennialType.A_H);
+
+				session.save(amarillo);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some hops!");
+			} finally {
+				session.close();
+			}
+		}
+
+		for (int i = 0; i <= numOfIngredients; i++) {
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				OtherIngredient other1 = getFakeOtherIngredient();
+
+				session.save(other1);
+				session.getTransaction().commit();
+
+				System.out.println("Saved some other ingredients!!");
+			} finally {
+				session.close();
+			}
+		}
+
+		for (int i = 0; i <= numOfIngredients; i++) {
+			session = factory.getCurrentSession();
+			try {
+				session.beginTransaction();
+
+				Place place = new Place(MunichType.COUNTRY, MunichType.CITY, MunichType.COORDINATES);
+				
+				session.save(place);
+
+				session.getTransaction().commit();
+
+				System.out.println("Done adding places!");
+			} finally {
+				session.close();
+			}
+		}
 		
-		for (int i = 0; i <= 10; i++) {
+		for (int i = 0; i <= 50; i++) {
 			
 			session = factory.getCurrentSession();
 			Long id;
@@ -201,20 +285,6 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.getTransaction().commit();
 
 				System.out.println("Done adding recipes!");
-			} finally {
-				session.close();
-			}
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Place place = new Place(MunichType.COUNTRY, MunichType.CITY, MunichType.COORDINATES);
-				
-				session.save(place);
-
-				session.getTransaction().commit();
-
-				System.out.println("Done adding places!");
 			} finally {
 				session.close();
 			}
@@ -348,85 +418,14 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Malt malt1 = getFakeMalt();
-				Malt malt2 = getFakeMalt();
-				Malt malt3 = getFakeMalt();
+				// long offset = 21 * (id - 1);
 
-				session.save(malt1);
-				session.save(malt2);
-				session.save(malt3);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some malts!");
-			} finally {
-				session.close();
-			}
-
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Yeast yeast1 = getFakeYeast();
-				Yeast yeast2 = getFakeYeast();
-				Yeast yeast3 = getFakeYeast();
-
-				session.save(yeast1);
-				session.save(yeast2);
-				session.save(yeast3);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some yeasts!!");
-			} finally {
-				session.close();
-			}
-
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				OtherIngredient other1 = getFakeOtherIngredient();
-				OtherIngredient other2 = getFakeOtherIngredient();
-				OtherIngredient other3 = getFakeOtherIngredient();
-
-				session.save(other1);
-				session.save(other2);
-				session.save(other3);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some other ingredients!!");
-			} finally {
-				session.close();
-			}
-
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Hop amarillo = new Hop(AmarilloType.NAME, faker.company().name(), AmarilloType.IMAGEURL, AmarilloType.NOTES, AmarilloType.STABILITY, AmarilloType.A_L, AmarilloType.A_H);
-				Hop cascade = new Hop(CascadeType.NAME, faker.company().name(), CascadeType.IMAGEURL, CascadeType.NOTES, CascadeType.STABILITY, CascadeType.A_L, CascadeType.A_H);
-				Hop centennial = new Hop(CentennialType.NAME, faker.company().name(), CentennialType.IMAGEURL, CentennialType.NOTES, CentennialType.STABILITY, CentennialType.A_L, CentennialType.A_H);
-
-				session.save(amarillo);
-				session.save(cascade);
-				session.save(centennial);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some hops!");
-			} finally {
-				session.close();
-			}
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				long offset = 21 * (id - 1);
-
-				Hop hop = session.get(Hop.class, Long.valueOf(10 + offset));
-				Yeast yeast = session.get(Yeast.class, Long.valueOf(4 + offset));
-				Malt malt = session.get(Malt.class, Long.valueOf(1 + offset));
-				OtherIngredient other = session.get(OtherIngredient.class, Long.valueOf(7 + offset));
-				Recipe recipe = session.get(Recipe.class, Long.valueOf(1 + (3 * (id - 1))));
-				Place place = session.get(Place.class, Long.valueOf(id));
+				Hop hop = session.get(Hop.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 2 + 3), (numOfIngredients * 3 + 3))));
+				Yeast yeast = session.get(Yeast.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 1 + 2), (numOfIngredients * 2 + 2))));
+				Malt malt = session.get(Malt.class, Long.valueOf(faker.number().numberBetween(1, (numOfIngredients * 1 + 1))));
+				OtherIngredient other = session.get(OtherIngredient.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 3 + 4), (numOfIngredients * 4 + 4))));
+				Recipe recipe = session.get(Recipe.class, Long.valueOf(faker.number().numberBetween(1, id * 3)));
+				Place place = session.get(Place.class, Long.valueOf(faker.number().numberBetween(1, (numOfIngredients * 1 + 1))));
 
 				place.addHop(hop);
 				place.addMalt(malt);
@@ -444,7 +443,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Hop hopFromDB = session.get(Hop.class, Long.valueOf(10));
+				Hop hopFromDB = session.get(Hop.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 2 + 3), (numOfIngredients * 3 + 3))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				HopDetail detail1 = getFakeHopDetail();
@@ -487,7 +486,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Malt maltFromDB = session.get(Malt.class, Long.valueOf(1));
+				Malt maltFromDB = session.get(Malt.class, Long.valueOf(faker.number().numberBetween(1, (numOfIngredients * 1 + 1))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				MaltDetail detail1 = getFakeMaltDetail();
@@ -530,7 +529,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				OtherIngredient otherIngredientFromDB = session.get(OtherIngredient.class, Long.valueOf(7));
+				OtherIngredient otherIngredientFromDB = session.get(OtherIngredient.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 3 + 4), (numOfIngredients * 4 + 4))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				OtherIngredientDetail detail1 = getFakeOtherIngredientDetail();
@@ -572,7 +571,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Yeast yeastFromDB = session.get(Yeast.class, Long.valueOf(4));
+				Yeast yeastFromDB = session.get(Yeast.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 1 + 2), (numOfIngredients * 2 + 2))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				YeastDetail detail1 = getFakeYeastDetail();
@@ -674,7 +673,7 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.beginTransaction();
 
 				User user = session.get(User.class, id);
-				Comment comment = session.get(Comment.class, Long.valueOf(13));
+				Comment comment = session.get(Comment.class, Long.valueOf(id));
 
 				Reply reply1 = getFakeReply();
 				Reply reply2 = getFakeReply();
@@ -703,7 +702,7 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.beginTransaction();
 
 				User user = session.get(User.class, id);
-				Reply reply = session.get(Reply.class, Long.valueOf(16));
+				Reply reply = session.get(Reply.class, Long.valueOf(faker.number().numberBetween(4, 6)));
 
 				Reply reply1 = getFakeReply();
 				Reply reply2 = getFakeReply();
@@ -809,7 +808,7 @@ public class DatabaseLoader implements CommandLineRunner {
 	}
 
 	private User getFakeUser(Set<Role> roles) {
-		User user = new User(faker.name().username(), Encoders.BASE64.encode(faker.internet().emailAddress().getBytes()), encoder.encode("password"));
+		User user = new User(faker.lorem().characters(1, 20), Encoders.BASE64.encode(faker.internet().emailAddress().getBytes()), encoder.encode("password"));
 		user.setRoles(roles);
 		return user;
 	}

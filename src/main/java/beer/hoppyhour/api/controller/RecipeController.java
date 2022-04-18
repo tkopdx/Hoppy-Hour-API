@@ -1,9 +1,8 @@
 package beer.hoppyhour.api.controller;
 
-import java.util.Set;
+import java.util.HashSet;
 
 import javax.transaction.Transactional;
-import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,16 +19,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import beer.hoppyhour.api.doa.projection.RecipeSearchResult;
-import beer.hoppyhour.api.entity.Ingredient;
-import beer.hoppyhour.api.entity.IngredientDetail;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.entity.User;
 import beer.hoppyhour.api.payload.request.PostRecipeRequest;
-import beer.hoppyhour.api.payload.request.SearchByIngredientsRequest;
 import beer.hoppyhour.api.payload.response.MessageResponse;
 import beer.hoppyhour.api.payload.response.PagingHeaders;
 import beer.hoppyhour.api.payload.response.PagingResponse;
@@ -114,12 +111,10 @@ public class RecipeController {
     }
 
     @GetMapping("/searchbyingredients")
-    public ResponseEntity<?> searchByIngredients(@Valid @RequestBody SearchByIngredientsRequest request, Sort sort, @PathParam("page-size") Long pageSize, @PathParam("page-number") Long pageNumber) {
+    public ResponseEntity<?> searchByIngredients(@RequestParam("id") HashSet<Long> ids, Sort sort, @RequestParam(name = "page-size", required = false) Long pageSize, @RequestParam( name = "page-number", required = false) Long pageNumber) {
         try {
-            //get ingredients from repo
-            Set<Ingredient<? extends IngredientDetail<?>>> ingredients = ingredientService.getAllByIdAsSet(request.getIds());
             // query with paging
-            final PagingResponse<RecipeSearchResult> recipes = recipePagingResponseService.getAllByExample(ingredients, pageSize, pageNumber, sort);
+            final PagingResponse<RecipeSearchResult> recipes = recipePagingResponseService.getAllByExample(ids, pageSize, pageNumber, sort);
             // return good response
             return ResponseEntity.ok().body(
                 recipes

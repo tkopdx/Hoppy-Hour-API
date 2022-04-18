@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import beer.hoppyhour.api.doa.RecipeRepository;
 import beer.hoppyhour.api.doa.projection.RecipeSearchResult;
-import beer.hoppyhour.api.entity.Ingredient;
-import beer.hoppyhour.api.entity.IngredientDetail;
 import beer.hoppyhour.api.entity.Recipe;
 import beer.hoppyhour.api.payload.response.PagingResponse;
 
@@ -59,17 +57,18 @@ public class RecipePagingResponseService implements IPagingResponseService<Recip
         return PageRequest.of(pageNumber.intValue(), pageSize.intValue(), sort);
     }
 
-    public PagingResponse<RecipeSearchResult> getAllByExample(Set<Ingredient<? extends IngredientDetail<?>>> ingredients, Long pageSize, Long pageNumber, Sort sort) {
+    public PagingResponse<RecipeSearchResult> getAllByExample(Set<Long> ingredients, Long pageSize, Long pageNumber, Sort sort) {
         if (!includesPageSizeAndPageNumber(pageSize, pageNumber)) {
             //default values
             pageSize = Long.valueOf(20);
             pageNumber = Long.valueOf(0);
         }
-
+        System.out.println("get service");
         return get(ingredients, buildPageRequest(pageSize, pageNumber, sort));
     }
 
-    public PagingResponse<RecipeSearchResult> get(Set<Ingredient<? extends IngredientDetail<?>>> ingredients, Pageable pageable) {
+    public PagingResponse<RecipeSearchResult> get(Set<Long> ingredients, Pageable pageable) {
+        System.out.println("making the repo query call in service");
         Page<RecipeSearchResult> page = recipeRepository.findAllByIngredientsWithPagination(ingredients, ingredients.size(), pageable);
         List<RecipeSearchResult> data = page.getContent();
         return new PagingResponse<RecipeSearchResult>(

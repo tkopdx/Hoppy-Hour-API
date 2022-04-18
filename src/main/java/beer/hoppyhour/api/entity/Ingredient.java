@@ -24,12 +24,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "ingredient")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public abstract class Ingredient<T extends IngredientDetail<T>> {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.TABLE)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id", updatable =  false, nullable = false)
     private Long id;
 
     @Column(name = "name")

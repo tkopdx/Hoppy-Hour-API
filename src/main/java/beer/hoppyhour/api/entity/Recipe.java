@@ -130,6 +130,7 @@ public class Recipe {
     private List<HopDetail> hopDetails;
 
     @JsonManagedReference
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToMany(cascade = {
         CascadeType.PERSIST,
         CascadeType.MERGE,
@@ -138,8 +139,8 @@ public class Recipe {
     })
     @JoinTable(
         name = "recipe_ingredient",
-        joinColumns = {@JoinColumn(name = "recipe_id") },
-        inverseJoinColumns = { @JoinColumn(name = "ingredient_id")}
+        joinColumns = {@JoinColumn(name = "recipe_id", referencedColumnName = "id", table = "recipe_ingredient") },
+        inverseJoinColumns = { @JoinColumn(name = "ingredient_id", referencedColumnName = "id", table = "recipe_ingredient")}
     )
     private Set<Ingredient<? extends IngredientDetail<?>>> ingredients = new HashSet<>();
     
@@ -185,7 +186,7 @@ public class Recipe {
         CascadeType.DETACH,
         CascadeType.REFRESH
     })
-    @JoinColumn(name = "place_id")
+    @JoinColumn(name = "place_id", nullable = true)
     private Place place;
 
     public Recipe() {}
