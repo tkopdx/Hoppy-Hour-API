@@ -22,6 +22,15 @@ public class Hop extends Ingredient<HopDetail> {
     @Column(name = "average_alpha_acid_high")
     private Double averageAlphaAcidHigh;
 
+    @Column(name = "average_beta_acid_high")
+    private Double averageBetaAcidHigh;
+
+    @Column(name = "average_beta_acid_low")
+    private Double averageBetaAcidLow;
+
+    @Column(name = "type")
+    private String type;
+
     @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
@@ -32,14 +41,20 @@ public class Hop extends Ingredient<HopDetail> {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    public Hop() {}
-
-    public Hop(String name, String brand, String image, String description, String stability, Double averageAlphaAcidLow, Double averageAlphaAcidHigh) {
+    public Hop(String name, String brand, String image, String description, String stability,
+            Double averageAlphaAcidLow, Double averageAlphaAcidHigh, Double averageBetaAcidHigh,
+            Double averageBetaAcidLow, String type, Place place) {
         super(name, brand, image, description);
         this.stability = stability;
         this.averageAlphaAcidLow = averageAlphaAcidLow;
         this.averageAlphaAcidHigh = averageAlphaAcidHigh;
+        this.averageBetaAcidHigh = averageBetaAcidHigh;
+        this.averageBetaAcidLow = averageBetaAcidLow;
+        this.type = type;
+        this.place = place;
     }
+
+    public Hop() {}
 
     public String getStability() {
         return stability;
@@ -77,6 +92,30 @@ public class Hop extends Ingredient<HopDetail> {
 
     public void setPlace(Place place) {
         this.place = place;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Double getAverageBetaAcidHigh() {
+        return averageBetaAcidHigh;
+    }
+
+    public void setAverageBetaAcidHigh(Double averageBetaAcidHigh) {
+        this.averageBetaAcidHigh = averageBetaAcidHigh;
+    }
+
+    public Double getAverageBetaAcidLow() {
+        return averageBetaAcidLow;
+    }
+
+    public void setAverageBetaAcidLow(Double averageBetaAcidLow) {
+        this.averageBetaAcidLow = averageBetaAcidLow;
     }
 
     

@@ -25,5 +25,15 @@ public class PlaceService implements IPlaceService {
             throw new EntityNotFoundException("No place with id " + id + " was found.");
         }
     }
+
+    @Override
+    public Place getCapitalByCountry(String country) {
+        Optional<Place> place = placeRepository.findByCountryAndIsCapital(country, true);
+        if (place.isPresent()) {
+            return place.get();
+        } else {
+            throw new EntityNotFoundException("No place with country " + country + " was found.");
+        }
+    }
     
 }

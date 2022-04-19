@@ -28,9 +28,15 @@ public class Place {
 
     @Column(name = "city")
     private String city;
+    
+    @Column(name = "is_capital")
+    private Boolean isCapital;
 
-    @Column(name = "coordinates")
-    private String coordinates;
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
 
     @JsonManagedReference
     @OneToMany(cascade =  {
@@ -82,13 +88,16 @@ public class Place {
     mappedBy = "place")
     private List<OtherIngredient> otherIngredients;
 
-    public Place() {}
-
-    public Place(String country, String city, String coordinates) {
+    public Place(Long id, String country, String city, Double latitude, Double longitude, Boolean isCapital) {
+        this.id = id;
         this.country = country;
         this.city = city;
-        this.coordinates = coordinates;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.isCapital = isCapital;
     }
+
+    public Place() {}
 
     public Long getId() {
         return id;
@@ -112,14 +121,6 @@ public class Place {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getCoordinates() {
-        return coordinates;
-    }
-
-    public void setCoordinates(String coordinates) {
-        this.coordinates = coordinates;
     }
 
     public List<Recipe> getRecipes() {
@@ -164,9 +165,9 @@ public class Place {
 
     @Override
     public String toString() {
-        return "Place [city=" + city + ", coordinates=" + coordinates + ", country=" + country + ", hops=" + hops
-                + ", id=" + id + ", malts=" + malts + ", otherIngredients=" + otherIngredients + ", recipes=" + recipes
-                + ", yeasts=" + yeasts + "]";
+        return "Place [city=" + city + ", country=" + country + ", hops=" + hops + ", id=" + id + ", latitude="
+                + latitude + ", longitude=" + longitude + ", malts=" + malts + ", otherIngredients=" + otherIngredients
+                + ", recipes=" + recipes + ", yeasts=" + yeasts + "]";
     }
 
     //convenience methods
@@ -214,5 +215,29 @@ public class Place {
 
         otherIngredients.add(otherIngredient);
         otherIngredient.setPlace(this);
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Boolean getIsCapital() {
+        return isCapital;
+    }
+
+    public void setIsCapital(Boolean isCapital) {
+        this.isCapital = isCapital;
     }
 }

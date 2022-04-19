@@ -1,5 +1,6 @@
 package beer.hoppyhour.api.component;
 
+import java.io.File;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashSet;
@@ -12,9 +13,16 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import beer.hoppyhour.api.doa.HopRepository;
+import beer.hoppyhour.api.doa.MaltRepository;
+import beer.hoppyhour.api.doa.OtherIngredientRepository;
+import beer.hoppyhour.api.doa.PlaceRepository;
+import beer.hoppyhour.api.doa.RecipeRepository;
+import beer.hoppyhour.api.doa.YeastRepository;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.Brewing;
 import beer.hoppyhour.api.entity.Comment;
@@ -43,24 +51,43 @@ import beer.hoppyhour.api.entity.VerificationToken;
 import beer.hoppyhour.api.entity.Yeast;
 import beer.hoppyhour.api.entity.YeastDetail;
 import beer.hoppyhour.api.model.ERole;
-import beer.hoppyhour.api.model.brand.WyeastType;
-import beer.hoppyhour.api.model.hop.AmarilloType;
-import beer.hoppyhour.api.model.hop.CascadeType;
-import beer.hoppyhour.api.model.hop.CentennialType;
 import beer.hoppyhour.api.model.hop.HopPurposeType;
-import beer.hoppyhour.api.model.malt.PilsnerMalt;
 import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
-import beer.hoppyhour.api.model.place.MunichType;
-import beer.hoppyhour.api.model.yeast._1056AmericanAle;
+import beer.hoppyhour.api.service.ExcelService;
 import io.jsonwebtoken.io.Encoders;
 
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
+	private static final String HOP_DATA_FILENAME = "data/hops.xlsx";
+	private static final String MALT_DATA_FILENAME = "data/malts.xlsx";
+	private static final String YEAST_DATA_FILENAME = "data/yeasts.xlsx";
+	private static final String PLACE_DATA_FILENAME = "data/worldcities.xlsx";
 
 	@Autowired
 	PasswordEncoder encoder;
+
+	@Autowired
+	ExcelService excelService;
+
+	@Autowired
+	HopRepository hopRepository;
+
+	@Autowired
+	MaltRepository maltRepository;
+
+	@Autowired
+	YeastRepository yeastRepository;
+
+	@Autowired
+	OtherIngredientRepository otherIngredientRepository;
+
+	@Autowired
+	PlaceRepository placeRepository;
+
+	@Autowired
+	RecipeRepository recipeRepository;
 
 	@Override
 	public void run(String... strings) throws Exception {
@@ -138,56 +165,57 @@ public class DatabaseLoader implements CommandLineRunner {
 		} finally {
 			session.close();
 		}
-
-		for (int i = 0; i <= numOfIngredients; i++) {
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Malt malt1 = getFakeMalt();
-
-				session.save(malt1);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some malts!");
-			} finally {
-				session.close();
-			}
+		
+		//load database with production place data
+		session = factory.getCurrentSession();
+		try {
+			session.beginTransaction();
+			File placeExcel = new ClassPathResource(PLACE_DATA_FILENAME).getFile();
+			excelService.save(placeExcel, "place");
+			session.getTransaction().commit();
+			System.out.println("Saved the places");
+		} finally{
+			session.close();
 		}
 
-		for (int i = 0; i <= numOfIngredients; i++) {
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Yeast yeast1 = getFakeYeast();
-
-				session.save(yeast1);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some yeasts!!");
-			} finally {
-				session.close();
-			}
+		//load database with production hop data
+		session = factory.getCurrentSession();
+		try {
+			session.beginTransaction();
+			File hopExcel = new ClassPathResource(HOP_DATA_FILENAME).getFile();
+			excelService.save(hopExcel, "hop");
+			session.getTransaction().commit();
+			System.out.println("Saved the hops");
+		} finally{
+			session.close();
 		}
+		
 
-		for (int i = 0; i <= numOfIngredients; i++) {
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Hop amarillo = new Hop(AmarilloType.NAME + i, faker.company().name(), AmarilloType.IMAGEURL, AmarilloType.NOTES, AmarilloType.STABILITY, AmarilloType.A_L, AmarilloType.A_H);
-				// Hop cascade = new Hop(CascadeType.NAME + i, faker.company().name(), CascadeType.IMAGEURL, CascadeType.NOTES, CascadeType.STABILITY, CascadeType.A_L, CascadeType.A_H);
-				// Hop centennial = new Hop(CentennialType.NAME + i, faker.company().name(), CentennialType.IMAGEURL, CentennialType.NOTES, CentennialType.STABILITY, CentennialType.A_L, CentennialType.A_H);
-
-				session.save(amarillo);
-				session.getTransaction().commit();
-
-				System.out.println("Saved some hops!");
-			} finally {
-				session.close();
-			}
+		//load database with production malt data
+		session = factory.getCurrentSession();
+		try {
+			session.beginTransaction();
+			File maltExcel = new ClassPathResource(MALT_DATA_FILENAME).getFile();
+			excelService.save(maltExcel, "malt");
+			session.getTransaction().commit();
+			System.out.println("Saved the malts");
+		} finally{
+			session.close();
 		}
+		
+
+		//load database with production yeast data
+		session = factory.getCurrentSession();
+		try {
+			session.beginTransaction();
+			File yeastExcel = new ClassPathResource(YEAST_DATA_FILENAME).getFile();
+			excelService.save(yeastExcel, "yeast");
+			session.getTransaction().commit();
+			System.out.println("Saved the yeasts");
+		} finally{
+			session.close();
+		}
+		
 
 		for (int i = 0; i <= numOfIngredients; i++) {
 			session = factory.getCurrentSession();
@@ -200,23 +228,6 @@ public class DatabaseLoader implements CommandLineRunner {
 				session.getTransaction().commit();
 
 				System.out.println("Saved some other ingredients!!");
-			} finally {
-				session.close();
-			}
-		}
-
-		for (int i = 0; i <= numOfIngredients; i++) {
-			session = factory.getCurrentSession();
-			try {
-				session.beginTransaction();
-
-				Place place = new Place(MunichType.COUNTRY, MunichType.CITY, MunichType.COORDINATES);
-				
-				session.save(place);
-
-				session.getTransaction().commit();
-
-				System.out.println("Done adding places!");
 			} finally {
 				session.close();
 			}
@@ -288,20 +299,6 @@ public class DatabaseLoader implements CommandLineRunner {
 			} finally {
 				session.close();
 			}
-			// session = factory.getCurrentSession();
-			// try {
-			// 	session.beginTransaction();
-
-			// 	User userFromDB = session.get(User.class, id);
-			// 	System.out.println("USER: " + userFromDB);
-			// 	System.out.println("RECIPES: " + userFromDB.getRecipes());
-
-			// 	session.getTransaction().commit();
-
-			// 	System.out.println("Done showing you!");
-			// } finally {
-			// 	session.close();
-			// }
 			session = factory.getCurrentSession();
 			try {
 				session.beginTransaction();
@@ -418,24 +415,25 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				// long offset = 21 * (id - 1);
+				long otherId = faker.number().numberBetween((hopRepository.count() + maltRepository.count() + yeastRepository.count() + 1), 
+				(hopRepository.count() + maltRepository.count() + yeastRepository.count() + otherIngredientRepository.count()));
+				long recipeId = faker.number().numberBetween(1, id * 3);
+				long placeId = faker.number().numberBetween(1, placeRepository.count());
 
-				Hop hop = session.get(Hop.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 2 + 3), (numOfIngredients * 3 + 3))));
-				Yeast yeast = session.get(Yeast.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 1 + 2), (numOfIngredients * 2 + 2))));
-				Malt malt = session.get(Malt.class, Long.valueOf(faker.number().numberBetween(1, (numOfIngredients * 1 + 1))));
-				OtherIngredient other = session.get(OtherIngredient.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 3 + 4), (numOfIngredients * 4 + 4))));
-				Recipe recipe = session.get(Recipe.class, Long.valueOf(faker.number().numberBetween(1, id * 3)));
-				Place place = session.get(Place.class, Long.valueOf(faker.number().numberBetween(1, (numOfIngredients * 1 + 1))));
+				System.out.println("other: " + otherId);
+				System.out.println("recipe: " + recipeId);
+				System.out.println("place: " + placeId);
 
-				place.addHop(hop);
-				place.addMalt(malt);
+				OtherIngredient other = session.get(OtherIngredient.class, Long.valueOf(otherId));
+				Recipe recipe = session.get(Recipe.class, Long.valueOf(recipeId));
+				Place place = session.get(Place.class, Long.valueOf(placeId));
+
 				place.addOtherIngredient(other);
 				place.addRecipe(recipe);
-				place.addYeast(yeast);
 
 				session.getTransaction().commit();
 
-				System.out.println("Done linking hop, yeast, malt, other, recipe to place!");
+				System.out.println("Done linking other and recipe to place!");
 			} finally {
 				session.close();
 			}
@@ -443,7 +441,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Hop hopFromDB = session.get(Hop.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 2 + 3), (numOfIngredients * 3 + 3))));
+				Hop hopFromDB = session.get(Hop.class, Long.valueOf(faker.number().numberBetween(1, hopRepository.count())));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				HopDetail detail1 = getFakeHopDetail();
@@ -486,7 +484,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Malt maltFromDB = session.get(Malt.class, Long.valueOf(faker.number().numberBetween(1, (numOfIngredients * 1 + 1))));
+				Malt maltFromDB = session.get(Malt.class, Long.valueOf(faker.number().numberBetween((hopRepository.count() + 1), (hopRepository.count() + maltRepository.count()))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				MaltDetail detail1 = getFakeMaltDetail();
@@ -529,7 +527,8 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				OtherIngredient otherIngredientFromDB = session.get(OtherIngredient.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 3 + 4), (numOfIngredients * 4 + 4))));
+				OtherIngredient otherIngredientFromDB = session.get(OtherIngredient.class, Long.valueOf(faker.number().numberBetween((hopRepository.count() + maltRepository.count() + yeastRepository.count() + 1), 
+				(hopRepository.count() + maltRepository.count() + yeastRepository.count() + otherIngredientRepository.count()))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				OtherIngredientDetail detail1 = getFakeOtherIngredientDetail();
@@ -571,7 +570,7 @@ public class DatabaseLoader implements CommandLineRunner {
 			try {
 				session.beginTransaction();
 
-				Yeast yeastFromDB = session.get(Yeast.class, Long.valueOf(faker.number().numberBetween((numOfIngredients * 1 + 2), (numOfIngredients * 2 + 2))));
+				Yeast yeastFromDB = session.get(Yeast.class, Long.valueOf(faker.number().numberBetween((hopRepository.count() + maltRepository.count() + 1), (hopRepository.count() + maltRepository.count() + yeastRepository.count()))));
 				Recipe recipeFromDB = session.get(Recipe.class, id);
 
 				YeastDetail detail1 = getFakeYeastDetail();
@@ -795,16 +794,6 @@ public class DatabaseLoader implements CommandLineRunner {
 	private OtherIngredient getFakeOtherIngredient() {
 		OtherIngredient other = new OtherIngredient(faker.food().spice(), faker.company().name(), faker.internet().image(), faker.lorem().paragraph());
 		return other;
-	}
-
-	private Yeast getFakeYeast() {
-		Yeast yeast = new Yeast(_1056AmericanAle.NAME, WyeastType.NAME, _1056AmericanAle.IMAGEURL, _1056AmericanAle.NOTES, _1056AmericanAle.TYPE, _1056AmericanAle.FLOCCULATION, _1056AmericanAle.ATTEN_LOW, _1056AmericanAle.ATTEN_HIGH, _1056AmericanAle.ABV_TOL, _1056AmericanAle.TEMP_HIGH, _1056AmericanAle.TEMP_LOW);
-		return yeast;
-	}
-
-	private Malt getFakeMalt() {
-		Malt malt = new Malt(PilsnerMalt.NAME, faker.company().name(), PilsnerMalt.IMAGEURL, PilsnerMalt.NOTES, PilsnerMalt.FUNCTION, PilsnerMalt.TYPE);
-		return malt;
 	}
 
 	private User getFakeUser(Set<Role> roles) {

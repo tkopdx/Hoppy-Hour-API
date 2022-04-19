@@ -34,6 +34,9 @@ public class Yeast extends Ingredient<YeastDetail> {
     @Column(name = "temperature_low")
     private Double temperatureLow;
 
+    @Column(name = "form")
+    private String form;
+
     @JsonBackReference
     @ManyToOne(cascade = {
         CascadeType.PERSIST,
@@ -46,7 +49,7 @@ public class Yeast extends Ingredient<YeastDetail> {
 
     public Yeast(String name, String brand, String image, String description, String type, String flocculation,
             Double apparentAttenuationLow, Double apparentAttenuationHigh, Double apparentAbvTolerance,
-            Double temperatureHigh, Double temperatureLow) {
+            Double temperatureHigh, Double temperatureLow, String form, Place place) {
         super(name, brand, image, description);
         this.type = type;
         this.flocculation = flocculation;
@@ -55,6 +58,8 @@ public class Yeast extends Ingredient<YeastDetail> {
         this.apparentAbvTolerance = apparentAbvTolerance;
         this.temperatureHigh = temperatureHigh;
         this.temperatureLow = temperatureLow;
+        this.form = form;
+        this.place = place;
     }
 
     public Yeast() {}
@@ -129,5 +134,13 @@ public class Yeast extends Ingredient<YeastDetail> {
 
     public void setPlace(Place place) {
         this.place = place;
+    }
+
+    public String getForm() {
+        return form;
+    }
+
+    public void setForm(String form) {
+        this.form = form;
     }
 }
