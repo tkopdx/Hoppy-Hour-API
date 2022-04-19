@@ -56,7 +56,7 @@ import beer.hoppyhour.api.model.otheringredient.OtherIngredientPurposeType;
 import beer.hoppyhour.api.service.ExcelService;
 import io.jsonwebtoken.io.Encoders;
 
-@Component
+// @Component
 public class DatabaseLoader implements CommandLineRunner {
 
 	private final static Faker faker = new Faker();
