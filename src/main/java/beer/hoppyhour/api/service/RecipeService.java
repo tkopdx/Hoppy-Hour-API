@@ -84,23 +84,7 @@ public class RecipeService implements IRecipeService {
     @Override
     public Recipe createNewRecipe(PostRecipeRequest request, User user) {
         // create new recipe object with request data
-        Recipe recipe = new Recipe(
-                request.getName(),
-                request.getOriginalGravity(),
-                request.getFinalGravity(),
-                request.getMethod(),
-                request.getStyle(),
-                request.getBoilTime(),
-                request.getBatchSize(),
-                request.getPreBoilSize(),
-                request.getPostBoilSize(),
-                request.getPreBoilGravity(),
-                request.getEfficiency(),
-                request.getHopUtilization(),
-                request.getIbu(),
-                request.getSrm(),
-                request.getMashpH(),
-                request.getCost());
+        Recipe recipe = setRecipeFields(new Recipe(), request);
         //associate place and recipe
         Place place = placeService.get(request.getPlace().getPlaceId());
         place.addRecipe(recipe);
@@ -176,6 +160,49 @@ public class RecipeService implements IRecipeService {
     @Override
     public Recipe save(Recipe recipe) {
         return recipeRepository.save(recipe);
+    }
+
+    @Override
+    public void delete(Recipe recipe) {
+        recipeRepository.delete(recipe);
+    }
+
+    @Override
+    public Boolean isRecipeOwner(Recipe recipe, Long userId) throws Exception {
+        if (recipe.getUser().getId().compareTo(userId) == 0) {
+            return true;
+        }
+
+        throw new Exception("User with id " + userId + " is not the owner of recipe with id " + recipe.getId());
+    }
+
+    @Override
+    public Recipe update(Recipe recipe, PostRecipeRequest request) {
+        //update all of the fields
+        recipe = setRecipeFields(recipe, request);
+        //save the recipe
+        return recipeRepository.save(recipe);
+    }
+
+    @Override
+    public Recipe setRecipeFields(Recipe recipe, PostRecipeRequest request) {
+        recipe.setName(request.getName());
+        recipe.setOriginalGravity(request.getOriginalGravity());
+        recipe.setFinalGravity(request.getFinalGravity());
+        recipe.setMethod(request.getMethod());
+        recipe.setStyle(request.getStyle());
+        recipe.setBoilTime(request.getBoilTime());
+        recipe.setBatchSize(request.getBatchSize());
+        recipe.setPreBoilGravity(request.getPreBoilSize());
+        recipe.setPostBoilSize(request.getPostBoilSize());
+        recipe.setPreBoilGravity(request.getPreBoilGravity());
+        recipe.setEfficiency(request.getEfficiency());
+        recipe.setHopUtilization(request.getHopUtilization());
+        recipe.setIbu(request.getIbu());
+        recipe.setSrm(request.getSrm());
+        recipe.setMashpH(request.getMashpH());
+        recipe.setCost(request.getCost());
+        return recipe;
     }
 
 }

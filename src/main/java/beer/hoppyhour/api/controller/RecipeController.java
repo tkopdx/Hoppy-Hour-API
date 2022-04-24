@@ -14,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -97,11 +99,12 @@ public class RecipeController {
                     @Spec(path = "abv", params = "abv", spec = Equal.class),
             }) Specification<Recipe> spec,
             Sort sort,
-            @PathParam("page-size") Long pageSize, 
+            @PathParam("page-size") Long pageSize,
             @PathParam("page-number") Long pageNumber) {
 
         try {
-            final PagingResponse<RecipeSearchResult> response = recipePagingResponseService.get(spec, pageSize, pageNumber, sort);
+            final PagingResponse<RecipeSearchResult> response = recipePagingResponseService.get(spec, pageSize,
+                    pageNumber, sort);
             return new ResponseEntity<>(response.getData(), returnHttpHeaders(response), HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
@@ -111,14 +114,16 @@ public class RecipeController {
     }
 
     @GetMapping("/searchbyingredients")
-    public ResponseEntity<?> searchByIngredients(@RequestParam("id") HashSet<Long> ids, Sort sort, @RequestParam(name = "page-size", required = false) Long pageSize, @RequestParam( name = "page-number", required = false) Long pageNumber) {
+    public ResponseEntity<?> searchByIngredients(@RequestParam("id") HashSet<Long> ids, Sort sort,
+            @RequestParam(name = "page-size", required = false) Long pageSize,
+            @RequestParam(name = "page-number", required = false) Long pageNumber) {
         try {
             // query with paging
-            final PagingResponse<RecipeSearchResult> recipes = recipePagingResponseService.getAllByExample(ids, pageSize, pageNumber, sort);
+            final PagingResponse<RecipeSearchResult> recipes = recipePagingResponseService.getAllByExample(ids,
+                    pageSize, pageNumber, sort);
             // return good response
             return ResponseEntity.ok().body(
-                recipes
-            );
+                    recipes);
         } catch (Exception e) {
             // return bad response
             return ResponseEntity.badRequest().body(
@@ -181,9 +186,65 @@ public class RecipeController {
         }
 
     }
+
     // TODO delete a recipe if user id matches recipe user id
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> deleteRecipe(@PathVariable Long id, Authentication authentication) {
+        try {
+            // get user details
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            // get the requested recipe and check against user id
+            Recipe recipe = recipeService.getRecipeById(id);
+            // delete if verified
+            if (recipeService.isRecipeOwner(recipe, userDetails.getId())) {
+                recipeService.delete(recipe);
+            }
+
+            // return response
+            return ResponseEntity.ok().body(
+                new MessageResponse(
+                    "Successfully deleted the recipe."
+                )
+            );
+            
+        } catch (Exception e) {
+            // return bad response
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error! " + e.getMessage()
+                )
+            );
+        }
+
+    }
 
     // TODO edit a recipe if user id matches recipe user id
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public ResponseEntity<?> updateRecipe(@PathVariable Long id, Authentication authentication, @RequestBody PostRecipeRequest request) {
+        try {
+            //get user details
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            //get recipe
+            Recipe recipe = recipeService.getRecipeById(id);
+            //if verified, update recipe
+            if (recipeService.isRecipeOwner(recipe, userDetails.getId())) {
+                recipe = recipeService.update(recipe, request);
+            }
+            //return recipe
+            return ResponseEntity.ok().body(
+                    recipe);
+
+        } catch (Exception e) {
+            //return bad response
+            return ResponseEntity.badRequest().body(
+                new MessageResponse(
+                    "Error! " + e.getMessage()
+                )
+            );
+        }
+    }
 
     // builds the RecipePagingResponse HttpHeaders object
     public HttpHeaders returnHttpHeaders(PagingResponse<RecipeSearchResult> response) {
