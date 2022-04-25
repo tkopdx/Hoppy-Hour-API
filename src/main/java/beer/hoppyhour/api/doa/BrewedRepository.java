@@ -8,7 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import beer.hoppyhour.api.entity.Brewed;
 import beer.hoppyhour.api.entity.User;
 
-@PreAuthorize("hasRole('ROLE_USER')")
+// @PreAuthorize("hasRole('ROLE_USER')")
 public interface BrewedRepository extends PagingAndSortingRepository<Brewed, Long> {
 
     //allow users to delete their own breweds
