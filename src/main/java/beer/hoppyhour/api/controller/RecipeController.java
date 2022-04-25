@@ -165,7 +165,7 @@ public class RecipeController {
 
     // TODO add a recipe if a user
     @PostMapping("")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    // @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> addNewRecipe(@RequestBody PostRecipeRequest request, Authentication authentication) {
         try {
             // get the currently logged in user
@@ -189,7 +189,7 @@ public class RecipeController {
 
     // TODO delete a recipe if user id matches recipe user id
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    // @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> deleteRecipe(@PathVariable Long id, Authentication authentication) {
         try {
             // get user details
@@ -221,7 +221,7 @@ public class RecipeController {
 
     // TODO edit a recipe if user id matches recipe user id
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    // @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> updateRecipe(@PathVariable Long id, Authentication authentication, @RequestBody PostRecipeRequest request) {
         try {
             //get user details

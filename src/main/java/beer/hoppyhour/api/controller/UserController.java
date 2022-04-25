@@ -81,7 +81,7 @@ public class UserController {
 
     //allows a logged in user to get their own detailed info
     @GetMapping("/{id}")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> getPrivateInfo(@PathVariable Long id, Authentication authentication) {
         
             try {
@@ -103,7 +103,7 @@ public class UserController {
 
     //allows a user to patch their own email
     @PatchMapping("/{id}/email")
-    @PreAuthorize("#id == authentication.principal.id") 
+    // @PreAuthorize("#id == authentication.principal.id") 
     public ResponseEntity<?> patchEmail(@PathVariable Long id, @Valid @RequestBody EmailPatchRequest emailPatchRequest) {
         try {
             //get the user
@@ -140,7 +140,7 @@ public class UserController {
 
     //allows an admin to patch a user's roles
     @PatchMapping("/{id}/roles")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    // @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> patchRoles(@PathVariable Long id, @Valid @RequestBody RolesPatchRequest request) {
         if (request.getStrRoles().isEmpty()) {
             return ResponseEntity.badRequest().body(
@@ -183,7 +183,7 @@ public class UserController {
 
     //allows a user to get their own breweds
     @GetMapping("/{id}/breweds")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> getBreweds(@PathVariable Long id) {
         try {
             //get the user
@@ -203,7 +203,7 @@ public class UserController {
 
     //allows a user to get their own tobrews
     @GetMapping("/{id}/tobrews")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> getToBrews(@PathVariable Long id) {
         try {
             //get the user
@@ -223,7 +223,7 @@ public class UserController {
 
     //allows a user to add a toBrew
     @PostMapping("/{id}/tobrews")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> saveNewToBrew(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {        
         try {
             //convert request string to Date object
@@ -250,7 +250,7 @@ public class UserController {
 
     //allows a user to patch their toBrew date
     @PatchMapping("/{id}/tobrews")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> patchToBrewDate(@PathVariable Long id, @Valid @RequestBody ToBrewDatePatchRequest request) {
         try {
             //make sure the client owns the requested item
@@ -276,7 +276,7 @@ public class UserController {
 
     //allows a user to delete a toBrew
     @DeleteMapping("/{id}/tobrews")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> deleteToBrew(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
         try {
             //make sure the client owns the requested item
@@ -302,7 +302,7 @@ public class UserController {
 
     //allows a user to get their own schedulings
     @GetMapping("/{id}/schedulings")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> getSchedulings(@PathVariable Long id) {
         try {
             //get the user
@@ -322,7 +322,7 @@ public class UserController {
 
     //allows a user to add a new scheduling
     @PostMapping("/{id}/schedulings")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> saveNewScheduling(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {
         try {
             //make a new scheduling object
@@ -347,7 +347,7 @@ public class UserController {
 
     //allows a user to delete their scheduling
     @DeleteMapping("/{id}/schedulings")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> deleteScheduling(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
         try {
             //make sure the client owns the requested item
@@ -373,7 +373,7 @@ public class UserController {
 
     //allows a user to get their own brewings
     @GetMapping("/{id}/brewings")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> getBrewings(@PathVariable Long id) {
         try {
             //get the user
@@ -392,7 +392,7 @@ public class UserController {
     }
     //allows a user to add a brewing
     @PostMapping("/{id}/brewings")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> saveNewBrewing(@PathVariable Long id, @Valid @RequestBody UserScheduleEventSaveRequest request) {
         try {
             //make a new brewing object
@@ -416,7 +416,7 @@ public class UserController {
     }
     //allows a user to delete a brewing
     @DeleteMapping("/{id}/brewings")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> deleteBrewing(@PathVariable Long id, @Valid @RequestBody UserScheduleEventDeleteRequest request) {
         try {
             //make sure the client owns the requested item
@@ -442,7 +442,7 @@ public class UserController {
     
     //allows a user to patch their own username
     @PatchMapping("/{id}/username")
-    @PreAuthorize("#id == authentication.principal.id")
+    // @PreAuthorize("#id == authentication.principal.id")
     public ResponseEntity<?> patchUsername(@PathVariable Long id, @Valid @RequestBody UsernamePatchRequest request) throws UserAlreadyExistsException {
         try {
             //get user
@@ -484,7 +484,7 @@ public class UserController {
 
     //allows an admin or a user to delete their own account
     @DeleteMapping("/{id}/delete")
-    @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
+    // @PreAuthorize("#id == authentication.principal.id or hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             //delete

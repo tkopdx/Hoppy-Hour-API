@@ -113,7 +113,7 @@ public class AuthController {
     }
 
     @PostMapping("/refreshtoken")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    // @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request) {
         try {
             String refreshToken = request.getRefreshToken();
